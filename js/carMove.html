@@ -186,7 +186,7 @@
         }
 
         class Car extends THREE.Group {
-            constructor(x = 0, z = 0, theta = Math.PI/2, objFileName = "./assets/obj/sportsCar.obj") {
+            constructor(x = 0, z = 0, theta = Math.PI/2, objFileName = "./assets/sportsCar.obj") {
                 super();
                 this.color = 0x89ceeb;
                 this.wireColor = 0x89ceeb;
@@ -380,7 +380,7 @@
 
 
     class Residential extends THREE.Group {
-        constructor(objFileName = "./assets/obj/building_04.obj") {
+        constructor(objFileName = "./assets/building_04.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -478,7 +478,7 @@
 
 
     class TreeObj extends THREE.Group {
-        constructor(objFileName = "./assets/obj/Tree.obj") {
+        constructor(objFileName = "./assets/Tree.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -577,7 +577,7 @@
       
 
     class HouseBuild extends THREE.Group {
-        constructor(objFileName = "./assets/obj/big-old-house.obj") {
+        constructor(objFileName = "./assets/big-old-house.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -676,7 +676,7 @@
 
 
     class Plants extends THREE.Group {
-        constructor(objFileName = "./assets/obj/pasto.obj") {
+        constructor(objFileName = "./assets/pasto.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -775,7 +775,7 @@
     
     
     class GasStation extends THREE.Group {
-        constructor(objFileName = "./assets/obj/gas.obj") {
+        constructor(objFileName = "./assets/gas.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -876,7 +876,7 @@
 
 
     class BuildingBig extends THREE.Group {
-        constructor(objFileName = "./assets/obj/building.obj") {
+        constructor(objFileName = "./assets/building.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -976,7 +976,7 @@
 
 
     class Fuente extends THREE.Group {
-        constructor(objFileName = "./assets/obj/FUENTE.obj") {
+        constructor(objFileName = "./assets/FUENTE.obj") {
             super();
             this.doubleSide = false;
             this.rotate = false;
@@ -1025,6 +1025,7 @@
                 }
             );
         }
+
         setWireframe(value = true) {
                 this.solid.setVisible(value);
         }
