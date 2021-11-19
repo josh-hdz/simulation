@@ -25,7 +25,16 @@
 
         "use strict";
 
-        let renderer, scene, camera, orbitControls, stats, gui, data, dataReady = false, k = 0;
+        let renderer,
+            scene,
+            camera,
+            orbitControls,
+            stats,
+            gui,
+            data,
+            dataReady = false,
+            k = 0,
+            arregloCar = [];
         
         function init(event) {
             // RENDERER ENGINE
@@ -48,16 +57,8 @@
             //scene.add(model);
 
             // CAMERA (PERSPECTIVE)
-            const fov = 60;    // Field ov view
-            const aspect = window.innerWidth / window.innerHeight;
-            const near = 0.01;
-            const far = 10000.0;
-            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(-100, 100, 300);
-            // CAMERA CONTROLS
-            orbitControls = new OrbitControls(camera, renderer.domElement);
-            //orbitControls.target = model.position;
-            orbitControls.update();
+            camera = new Camera()
+            camera.setTopView()
 
             // SETUP STATS
             stats = new Stats();
@@ -72,6 +73,29 @@
                 scenary.axes.setVisible(value);
             });
             guiSceneMenu.open();
+
+             // CAMARA MENU
+            const guiModelMenu = gui.addFolder("Camera Menu");
+            // GUI-Model
+            guiModelMenu.add(camera.orbitControls, "autoRotate").setValue(camera.orbitControls.autoRotate).name("Autorotate").listen().onChange(function(value) {
+                camera.setAutoRotate(value);
+            });
+            guiModelMenu.add(camera, "top").setValue(camera.top).name("Top View").listen().onChange(function(value) {
+                camera.setTopView(value);
+            });
+            guiModelMenu.add(camera, "inModel").setValue(camera.inModel).name("First Person POV").listen().onChange(function(value) {
+                camera.setInModelView(model);                                    
+            });
+            guiModelMenu.add(camera, "perspective").name("Perspective View").setValue(camera.perspective).listen().onChange(function(value) {
+                camera.setPerspectiveView(value);
+            });
+            guiModelMenu.add(camera, "front").name("Front View").setValue(camera.front).listen().onChange(function(value) {
+                camera.setFrontView(value);
+            });
+            guiModelMenu.add(camera, "side").setValue(camera.side).name("Side View").listen().onChange(function(value) {
+                camera.setSideView(value);
+            });
+
             //read json data
             readTextFile("./simul_data.json", function(text){
                 data = JSON.parse(text);
@@ -91,8 +115,11 @@
             stats.end();
             requestAnimationFrame(renderLoop);
         }
-        let arregloCar = [];
+        
         function updateScene() {
+            if(camera.orbitControls.autoRotate) {
+                camera.orbitControls.update();
+            }
            /*if(model && model.animate) {
                 model.position.z = model.position.z - 0.2;
                //model.rotation.y = model.rotation.y + 0.01;
@@ -1080,15 +1107,19 @@
             this.axes = new Axes(size);
             this.floor = new Floor(size);
             this.buildings = [];
+
+
+
+
             //SE
-            this.buildings.push(new Tree(150, 35, 100, 100, 50));
-            this.buildings.push(new Tree(250, 35, 100, 100, 50));
-            this.buildings.push(new Tree(50, 35, 100, 100, 50));
-            this.buildings.push(new Tree(-35, 35, 100, 100, 50));
-            this.buildings.push(new Tree(-70, 35, 100, 100, 50));
-            this.buildings.push(new Tree(-105, 35, 100, 100, 50));
-            this.buildings.push(new Tree(-140, 35, 100, 100, 50));
-            this.buildings.push(new Tree(-175, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(150, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(250, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(50, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(-35, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(-70, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(-105, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(-140, 35, 100, 100, 50));
+            // this.buildings.push(new Tree(-175, 35, 100, 100, 50));
             this.buildings.push(new ResHouse(120, 200, 50, 50, 10, 0xd7d7d7, 0x655b5b));
             this.buildings.push(new ResHouse(-70, 120, 50, 50, 10, 0xeed09d, 0x655b5b));
             this.buildings.push(new ResHouse(-140, 120, 50, 50, 10, 0xeed09d, 0x655b5b));
@@ -1098,9 +1129,9 @@
             this.buildings.push(new House(-205, 160, 50, 50, 20, 0xB22222, 0xffffff));
             this.buildings.push(new House(-315, 160, 50, 50, 20, 0xB22222, 0xffffff));
 
-            this.buildings.push(new Tree(-260, 100, 100, 100, 50));
-            this.buildings.push(new Tree(-220, 100, 100, 100, 50));
-            this.buildings.push(new Tree(-300, 100, 100, 100, 50));
+            // this.buildings.push(new Tree(-260, 100, 100, 100, 50));
+            // this.buildings.push(new Tree(-220, 100, 100, 100, 50));
+            // this.buildings.push(new Tree(-300, 100, 100, 100, 50));
 
             this.buildings.push(new House(100, 35, 50, 50, 20, 0xec7c26, 0xF5F5DC));
             this.buildings.push(new House(200, 35, 50, 50, 20, 0xec7c26, 0xF5F5DC));
@@ -1113,14 +1144,14 @@
             this.buildings.push(new House(50, 100, 50, 50, 20, 0Xa18262, 0xF5F5DC));
             this.buildings.push(new House(90, 100, 50, 50, 20, 0Xa18262, 0xF5F5DC));
 
-            this.buildings.push(new Plant(100, -90, 50, 50, 50));
-            this.buildings.push(new Plant(100, -250, 50, 50, 50));
-            this.buildings.push(new Plant(280, -250, 50, 50, 50));
+            // this.buildings.push(new Plant(100, -90, 50, 50, 50));
+            // this.buildings.push(new Plant(100, -250, 50, 50, 50));
+            // this.buildings.push(new Plant(280, -250, 50, 50, 50));
             this.buildings.push(new ResHouse(220, -90, 50, 50, 10, 0xffffff, 0xf3ca4c));
             this.buildings.push(new Fontain(90, -90, 50, 50, 50,  0x000000,  0x655b5b));
-            this.buildings.push(new Tree(300, -60, 100, 100, 50));
-            this.buildings.push(new Tree(300, -90, 100, 100, 50));
-            this.buildings.push(new Tree(300, -120, 100, 100, 50));
+            // this.buildings.push(new Tree(300, -60, 100, 100, 50));
+            // this.buildings.push(new Tree(300, -90, 100, 100, 50));
+            // this.buildings.push(new Tree(300, -120, 100, 100, 50));
 
             this.buildings.push(new House(-230, -35, 50, 50, 20, 0x024a86, 0xffffff));
             this.buildings.push(new House(-200, -80, 50, 50, 20, 0x024a86, 0xffffff));
@@ -1129,7 +1160,7 @@
             this.buildings.push(new ResHouse(-400, -70, 50, 50, 10, 0X000000, 0x024a86));
             this.buildings.push(new ResHouse(-400, -150, 50, 50, 10, 0X000000, 0x024a86));
 
-            this.buildings.push(new Gas(-50, -50, 50, 50, 10,  0x434b4d, 0x000000));
+            // this.buildings.push(new Gas(-50, -50, 50, 50, 10,  0x434b4d, 0x000000));
             this.buildings.push(new ResHouse(-50, -170, 50, 50, 10, 0X000000, 0x761125));
             this.buildings.push(new ResHouse(-50, -250, 50, 50, 10, 0X000000, 0x761125));
 
@@ -1146,6 +1177,104 @@
             }
         }
         
+    }
+
+    class Camera extends THREE.PerspectiveCamera {
+        constructor(
+            fov=60,
+            aspect=window.innerWidth / window.innerHeight,
+            near=0.01,
+            far=10000.0
+        ) {
+            super(fov, aspect, near, far)
+            // CAMERA CONTROLS
+            this.orbitControls = new OrbitControls(
+                this,
+                renderer.domElement
+            );
+            this.orbitControls.update();
+            this.top = true
+            this.perspective = false
+            this.inModel = false
+            this.front = false
+            this.side = false
+            this.setTopView()
+        }
+
+        setPerspectiveView(value=true) {
+            this.top = false
+            this.perspective = value
+            this.inModel = false
+            this.front = false
+            this.side = false
+
+            this.position.set(-100, 200, 300);
+            this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+            this.up.set(0, 1, 0);
+            this.orbitControls.update();
+        }
+
+        setTopView(value=true) {
+            this.top = true
+            this.perspective = false
+            this.inModel = false
+            this.front = false
+            this.side = false
+
+            this.position.set(0, 600, 0);
+            this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+            this.up.set(0, 0, 1);
+            this.orbitControls.update();
+        }
+
+        setFrontView(value=true) {
+            this.top = false
+            this.perspective = false
+            this.inModel = false
+            this.front = true
+            this.side = false
+
+            this.position.set(0, 1.8, 220);
+            this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+            this.up.set(0, 1, 0);
+            this.orbitControls.update();
+        }
+
+        setSideView(value=true) {
+            this.top = false
+            this.perspective = false
+            this.inModel = false
+            this.front = false
+            this.side = true
+
+            this.position.set(220, 1.8, 0);
+            this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+            this.up.set(0, 1, 0);
+            this.orbitControls.update();
+        }
+
+        setInModelView(model) {
+            if(model) {
+                this.top = false
+                this.perspective = false
+                this.inModel = true
+                this.front = false
+                this.side = false
+
+                this.position.set(
+                    model.position.x -0.3,
+                    model.position.y + 0.9,
+                    model.position.z
+                );
+                this.orbitControls.target = new THREE.Vector3(0, 0, model.position.z - 10);
+                this.up.set(0, 1, 0);
+                this.orbitControls.update();
+            }
+        }
+        
+        setAutoRotate(value=true) {
+            this.orbitControls.autoRotate = value;
+        }
     }
     </script>
 </body>
