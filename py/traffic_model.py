@@ -1,15 +1,22 @@
-from agentpy import Model, AgentList, Space
+from agentpy import Model, AgentList, Space, AttrIter
 from car_agent import CarAgent
 
 class TrafficModel (Model):
 
     def setup(self):
+        direction = AttrIter(
+            (
+                ([1] * int(self.p['car']['amount'] * self.p['density'])) +\
+                ([-1] * int(self.p['car']['amount'] * (1 - self.p['density'])))
+            )
+        )
 
         # Generate agents.
         self.agents = AgentList(
             self,
             self.p["car"]["amount"],
             CarAgent,
+            direction=direction
         )
 
         # Generate space.
