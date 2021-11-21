@@ -15,7 +15,7 @@ class TrafficModel (Model):
         # Generate space.
         self.intersection = Space(self, (self.p['a'], self.p['a']))
 
-        self.intersection.add_agents(self.agents, self._init_cars_loc())
+        self.intersection.add_agents(self.agents, self.place_cars())
 
     def step(self):
         self.agents.move()
@@ -26,13 +26,13 @@ class TrafficModel (Model):
     def end(self):
         pass 
 
-    def _init_cars_loc(self):
+    def place_cars(self):
         # Next car's y cordenate in upstream lane.
         next_up_lane = 0.5 * self.p['a'] - self.p['b']
         # Next car's y cordenate in downstream lane.
         next_down_lane = 0.5 * self.p['a'] + self.p['b']
         # agent list index to separate car's in lanes.
-        division_index = int(self.p["car"]["amount"] * self.p["density"])
+        division_index = int(self.p["car"]["amount"] * self.p["lane density"])
         positions = []
 
         # Cars spwaned in upstream lane.
@@ -44,7 +44,7 @@ class TrafficModel (Model):
                 )
             )
 
-            next_up_lane -= next_car.length + next_car.front_min_dist
+            next_up_lane -= next_car.length + next_car.min_distance
 
         # Cars spawned in downstrem lane.
         for next_car in self.agents[division_index::]:
@@ -55,6 +55,6 @@ class TrafficModel (Model):
                 )
             )
 
-            next_down_lane += next_car.length + next_car.front_min_dist
+            next_down_lane += next_car.length + next_car.min_distance
 
         return positions
