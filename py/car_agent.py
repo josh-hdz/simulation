@@ -2,8 +2,9 @@ from agentpy import Agent
 
 class CarAgent (Agent):
 
-    def setup(self):
-        self.velocity = 0
+    def setup(self, **kwargs):
+        self.velocity = 0.0
+        self.direction = kwargs['direction']
         self.max_velocity = self.model.random.uniform(
             self.p['car']['max vel range'][0],
             self.p['car']['max vel range'][1]

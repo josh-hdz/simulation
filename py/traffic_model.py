@@ -32,7 +32,7 @@ class TrafficModel (Model):
         # Next car's y cordenate in downstream lane.
         next_down_lane = 0.5 * self.p['a'] + self.p['b']
         # agent list index to separate car's in lanes.
-        division_index = int(self.p["car"]["amount"] * self.p["lane density"])
+        division_index = int(self.p["car"]["amount"] * self.p["density"])
         positions = []
 
         # Cars spwaned in upstream lane.
@@ -44,7 +44,7 @@ class TrafficModel (Model):
                 )
             )
 
-            next_up_lane -= next_car.length + next_car.min_distance
+            next_up_lane -= next_car.length + next_car.front_min_dist
 
         # Cars spawned in downstrem lane.
         for next_car in self.agents[division_index::]:
@@ -55,6 +55,6 @@ class TrafficModel (Model):
                 )
             )
 
-            next_down_lane += next_car.length + next_car.min_distance
+            next_down_lane += next_car.length + next_car.front_min_dist
 
         return positions

@@ -6,12 +6,12 @@ def main():
             "amount": 100,
             "length range": (1.8, 2.3),
             "max vel range": (10.0, 16.67),
-            "min distance range": (0.5, 1.0)
+            "min dist range": (0.5, 1.0)
         },
-        'a': 300,
+        'a': 1000,
         'b': 5,
         'l': 3.6,
-        "lane density": 0.5
+        "density": 0.5
     }
 
     model = TrafficModel(param)
