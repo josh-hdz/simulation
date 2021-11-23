@@ -1,6 +1,7 @@
 from agentpy import Model, AgentList, Space, AttrIter
 from car_agent import CarAgent
-
+import json
+import itertools
 class TrafficModel (Model):
 
     def setup(self):
@@ -64,5 +65,12 @@ class TrafficModel (Model):
             )
 
             next_down_lane += next_car.length + next_car.front_min_dist
-
+        
+       
+        print(len(positions))
+        lst2 = [{'x':positions[i][0]/10,'z':positions[i][1]/10, 'id':i} for i in range(len(positions))]
+        diccionario_codificado = json.dumps(lst2)
+        print(diccionario_codificado)
+        with open('data.json', 'w') as file:
+            json.dump(lst2, file, indent=2)
         return positions

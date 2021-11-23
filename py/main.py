@@ -17,6 +17,6 @@ def main():
 
     model = TrafficModel(param)
     result = model.run()
-
+    print(result)
 if __name__ == "__main__":
     main()
