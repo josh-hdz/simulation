@@ -9,6 +9,7 @@ def main():
             "min dist range": (0.5, 1.0)
         },
         'a': 1000,
+        'step time': 0.1,
         'b': 5,
         'l': 3.6,
         "density": 0.5

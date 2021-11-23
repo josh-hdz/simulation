@@ -6,13 +6,13 @@ class TrafficModel (Model):
     def setup(self):
         direction = AttrIter(
             (
-                ([1] * int(self.p['car']['amount'] * self.p['density'])) +\
-                ([-1] * int(self.p['car']['amount'] * (1 - self.p['density'])))
+                ([(0, 1)] * int(self.p['car']['amount'] * self.p['density'])) +\
+                ([(0, -1)] * int(self.p['car']['amount'] * (1 - self.p['density'])))
             )
         )
 
-        # Generate agents.
-        self.agents = AgentList(
+        # Generate car agents.
+        self.cars = AgentList(
             self,
             self.p["car"]["amount"],
             CarAgent,
@@ -22,10 +22,11 @@ class TrafficModel (Model):
         # Generate space.
         self.intersection = Space(self, (self.p['a'], self.p['a']))
 
-        self.intersection.add_agents(self.agents, self.place_cars())
+        self.intersection.add_agents(self.cars, self.place_cars())
 
     def step(self):
-        self.agents.move()
+        self.cars.update_position()
+        self.cars.update_speed()
 
     def update(self):
         pass
@@ -43,7 +44,7 @@ class TrafficModel (Model):
         positions = []
 
         # Cars spwaned in upstream lane.
-        for next_car in self.agents[0:division_index:]:
+        for next_car in self.cars[0:division_index:]:
             positions.append(
                 (
                     round(0.5 * (self.p['a'] + self.p['l']), 1),# X cordenate.
@@ -54,7 +55,7 @@ class TrafficModel (Model):
             next_up_lane -= next_car.length + next_car.front_min_dist
 
         # Cars spawned in downstrem lane.
-        for next_car in self.agents[division_index::]:
+        for next_car in self.cars[division_index::]:
             positions.append(
                 (
                     round(0.5 * (self.p['a'] - self.p['l']), 1),# X cordenate.
