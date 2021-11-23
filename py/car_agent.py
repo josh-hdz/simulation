@@ -23,25 +23,42 @@ class CarAgent (Agent):
 
     def update_speed(self):
         front_dist = self.p['a']
+        traffic_light_dist = self.p['a']
+        traffic_lisght_state = None
 
         for car in self.model.cars:
             dist = self._get_front_dsit(car)
 
-            if dist != -1:
-                front_dist = dist
+            front_dist = dist if dist != -1 else front_dist
+
+        for traffic_light in self.model.traffic_light:
+            dist = self._get_traffic_light_dist()
+
+            if traffic_light_dist > dist:
+                traffic_lisght_dist = dist
+                traffic_light_state = traffic_light.state
 
         # Actualiza la velocidad del auto
+        if front_dist < self.front_min_dist:
+            self.speed = 0
+            self.state = 1
+        elif front_dist < 20:
+            self.speed = np.maximum(self.speed - 200*self.step_time, 0)
 
-        if self.speed > 0:
-            if front_dist < 2:
-                self.speed = 0
+        elif front_dist < 50:
+            self.speed = np.maximum(self.speed - 80*self.step_time, 0)
 
-            elif front_dist < 20:
-                self.speed = np.maximum(self.speed - 200*self.step_time, 0)
-            elif front_dist < 50:
-                self.speed = np.maximum(self.speed - 80*self.step_time, 0)
+        elif traffic_light_dist < 40 and traffic_light_state == 1:
+            self.speed = np.minimum(self.speed + 5*self.step_time, self.max_speed)
+
+        elif traffic_light_dist < 50 and traffic_light_state == 1:
+            self.speed = np.maximum(self.speed - 20*self.step_time, 0)
+            
+        elif traffic_light_dist < 100 and traffic_light_state == 2:
+            self.speed = np.maximum(self.speed - 80*self.step_time, 0)
+
         else:
-            self.speed = 2
+            self.speed = np.minimum(self.speed + 5*self.step_time, self.max_speed) 
 
     def update_position(self):
         self.model.intersection.move_by(
@@ -74,8 +91,28 @@ class CarAgent (Agent):
         # Invalid distance.
         return -1
 
-    def _get_traffic_light_dist(self):
-        pass
+    def _get_traffic_light_dist(self, target):
+        c = self.model.intersection.position[self]
+        t = self.model.intersection.position[target]
+
+        dp_direction = self._dot_product(
+            target.direction,
+            self.directin
+        )
+
+        dp_place = self._dot_product(
+            (
+                t[0] - c[0],
+                t[1] - c[1]
+            ),
+            self.direction
+        )
+
+        if dp_direction < 0 and dp_place > 0:
+            return math.sqrt((c[0] - t[0])**2 + (c[1] - t[1])**2)
+
+        # Invalid target.
+        return -1
     
     # def move(self):
     #     intersec = self.model.intersection
