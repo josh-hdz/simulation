@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html, body
+        {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+      </style>
+</head>
+<body>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        import Stats from "https://unpkg.com/three/examples/jsm/libs/stats.module.js";
+        import {OrbitControls} from "https://unpkg.com/three@0.119.0/examples/jsm/controls/OrbitControls.js";
+        import {OBJLoader} from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/loaders/OBJLoader.js';
+
+        "use strict";
+
+        let renderer, scene, camera,scenary, orbitControls, dataSem, model, stats, gui,dataReady = false, data, k=0, dataReadySem = false;
+        
+        function init(event) {
+            // RENDERER ENGINE
+            renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+            renderer.setClearColor(new THREE.Color(0, 0, 0));
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+            
+            // SCENE
+            scene = new THREE.Scene();
+
+            // MODELS
+            scenary = new Scenary();
+            
+
+            // SCENE GRAPH
+            scene.add(scenary);
+            camera = new Camera();
+            camera.setTopView(); 
+
+            // CAMERA (PERSPECTIVE)
+            /*const fov = 60;    // Field ov view
+            const aspect = window.innerWidth / window.innerHeight;
+            const near = 0.01;
+            const far = 10000.0;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.set(-100, 100, 300);
+            // CAMERA CONTROLS
+            orbitControls = new OrbitControls(camera, renderer.domElement);
+            //orbitControls.target = model.position;
+            orbitControls.update();*/
+
+            // SETUP STATS
+            stats = new Stats();
+            stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+            document.body.appendChild(stats.dom);
+            
+            // GUI
+            gui = new dat.GUI();
+            // SCENE-MENU
+            const guiSceneMenu = gui.addFolder("Scene Menu");
+            guiSceneMenu.add(scenary.axes, "visible").setValue(scenary.axes.visible).name("World Axes").listen().onChange(function(value) {
+                scenary.axes.setVisible(value);
+            });
+            guiSceneMenu.open();
+            const guiCamaraMenu = gui.addFolder("Camera Menu");
+            guiCamaraMenu.add(camera.orbitControls, "autoRotate").setValue(camera.rotate).name("Rotate").listen().onChange(function(value) {
+                camera.setAutoRotate(value);                                   
+            });
+            //guiCamaraMenu.add(camera, "update").setValue(camera.update).name("Perspective View").listen().onChange(function(value) {
+               // camera.setPerspectiveView();                                   
+            //});
+
+            guiCamaraMenu.add(camera, "pers" ).setValue(this.pers).name("Perspective View").listen().onChange(function(value) {
+                camera.setPerspectiveView();                                     
+            });
+            guiCamaraMenu.add(camera, "top" ).setValue(camera.top).name("Top View").listen().onChange(function(value) {
+                camera.setTopView();                            
+            });
+            guiCamaraMenu.add(camera, "front" ).setValue(camera.front).name("Front View").listen().onChange(function(value) {
+                camera.setFrontView();                             
+            });
+            guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
+                camera.setSideView();                            
+            });
+            readTextFile("/data.json", function(text){
+                data = JSON.parse(text);
+                console.log(data.length);
+                dataReady = true; 
+
+            });
+            readTextFile2("a.json", function(text){
+                dataSem = JSON.parse(text);
+                console.log(dataSem.length);
+                dataReadySem = true; 
+
+            });
+
+            // DRAW SCENE IN A RENDER LOOP (ANIMATION)
+            renderLoop();
+        }
+
+        function renderLoop() {
+            stats.begin();
+            renderer.render(scene, camera); // DRAW THE SCENE GRAPH
+            updateScene();
+            stats.end();
+            requestAnimationFrame(renderLoop);
+        }
+
+        let arregloCar = [];
+        function updateScene() {
+            if(dataReady && k < data.length && dataReadySem){
+                
+                for(let i = 0; i < 7; i++){
+                    console.log(data.length);
+                    //const carID = 0;
+                    const carID = data[k].id;
+                    
+                    //const carID = 0;
+                    const x = data[k].x*3;
+                    const z = data[k].z;
+                    const dir = Math.PI/2;
+                    
+                    let car = scene.getObjectByName(carID);
+                    if(!car){
+                        console.log("    jjdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+                        let car = new Car(x, z, dir);
+                        car.name = carID;
+                        arregloCar.push(car);
+                        //scene.add(car);
+
+                    }
+                    else{
+                        console.log(i);
+                        car.setPosition(x, z);
+                        //car.setDirection(dir);
+
+                    }
+                  
+                    
+                }
+                if(dataSem[k].id == 0){
+                        if(dataSem[k].id == 0){
+                            scenary.buildings[scenary.buildings.length-2].setColorGreen();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-2].setColorRed();
+
+                        }
+
+                    }
+                    else{
+                        if(dataSem[k].id == 0){
+                            scenary.buildings[scenary.buildings.length-1].setColorGreen();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-1].setColorRed();
+
+                        }
+
+                }
+                k++;
+                //console.log(arregloCar.length);
+                for(let i = 0; i < arregloCar.length; i++){
+                    console.log(arregloCar.length);
+                    scene.add(arregloCar[i]);
+                }
+                arregloCar = [];
+                
+            }
+           
+        }
+
+        function readTextFile(file, callback) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function() {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send(null);
+        }
+        function readTextFile2(file, callback) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function() {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send(null);
+        }
+
+        // EVENT LISTENERS & HANDLERS
+        document.addEventListener("DOMContentLoaded", init);
+
+        window.addEventListener("resize", () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);            
+        }, false);
+
+        class Axes extends THREE.AxesHelper {
+            constructor(size = 10, visible = true) {
+                super(size);
+                this.size = size;
+                this.visible = visible;
+                this.position.set(0, 1, 0);
+            }
+            setVisible(value) {
+                this.visible = value;
+            }
+        }
+        class Camera extends THREE.PerspectiveCamera {
+            constructor(fov = 60, aspect = window.innerWidth / window.innerHeight, near = 0.01, far = 10000){
+                super(fov, aspect, near, far);
+                // CAMERA CONTROLS
+                this.car = false;
+                this.dirigida = false;
+                //this.matrix = false;
+                this.pers = false;
+                this.top = false;
+                this.front = false;
+                this.side = false;
+                this.in = false;
+                //this.orbitControls.autoRotate = false; 
+                this.orbitControls = new OrbitControls(this, renderer.domElement);
+                this.orbitControls.update(); 
+
+            }
+            setPerspectiveView() {
+                //this.pers = true;
+                this.dirigida = false;
+                //this.matrix = false;
+                this.car = false;
+                this.top = false;
+                this.front = false;
+                this.side = false;
+                this.in = false;
+                //this.orbitControls.autoRotate = false; 
+                this.position.set(-100, 500, 300);
+                this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+                this.up.set(0, 1, 0);
+                this.orbitControls.update();
+            }
+            setTopView() {
+                //this.top = true;
+                this.dirigida = false;
+                //this.matrix = false;
+                this.car = false;
+                this.pers = false;
+                this.front = false;
+                this.side = false;
+                this.in = false;
+                //this.orbitControls.autoRotate = false; 
+                this.position.set(0, 500, 0);
+                this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+                this.up.set(-1, 0, 0);
+                this.orbitControls.update();
+            }
+            setFrontView() {
+                this.dirigida = false;
+                //this.matrix = false;
+                this.car = false;
+                this.top = false;
+                this.pers = false;
+                this.side = false;
+                this.in = false;
+                this.position.set(0, 4, 500);
+                this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+                this.up.set(0, 1, 0);
+                this.orbitControls.update();
+            }
+            setSideView() {
+                this.dirigida = false;
+                //this.matrix = false;
+                this.car = false;
+                this.top = false;
+                this.pers = false;
+                this.front = false;
+                this.in = false;
+                //this.orbitControls.autoRotate = false; 
+                this.position.set(500, 100, 0);
+                this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+                this.up.set(0, 1, 0);
+                this.orbitControls.update();
+            }
+           
+
+            setAutoRotate(value = true) {
+                this.car = false;
+                this.top = false;
+                this.pers = false;
+                this.side = false;
+                this.in = false;
+                this.dirigida = false;
+                
+                this.orbitControls.autoRotate = value;
+            }
+        
+        }
+        class Floor extends THREE.Group {
+            constructor(size = 100) {
+                super();
+                this.size = size;
+                const geometry = new THREE.PlaneGeometry(size, size);
+                const material = new THREE.MeshBasicMaterial({color: 0x808080});
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.rotation.x = -Math.PI / 2;
+                this.gridHelper = new THREE.GridHelper(size, 10, 0xff0000, 0x000000);
+                // CHILDREN
+                this.add(this.mesh);
+                this.add(this.gridHelper);
+            }
+            setVisible(value = true) {
+                this.visible = value;
+            }
+            setWireframe(value = true) {
+                this.material.wireframe = value;
+            }
+            setColor(color) {
+                this.mesh.material.color.setHex(color);
+            }
+        }
+
+        class Cube extends THREE.Group {
+            constructor(size = 0.1, color = 0xcc0000, wireColor = 0xffffff) {
+                super();
+                this.size = size;
+                this.color = color;
+                this.wireColor = wireColor;
+                this.doubleSide = false;
+                this.rotate = false;
+                const geometry = new THREE.BoxGeometry(size, size, size);
+                const material = new THREE.MeshBasicMaterial({color});
+                const materialWire = new THREE.MeshBasicMaterial({wireframe: true, color: wireColor});
+                this.solid = new THREE.Mesh(geometry, material);
+                this.wire = new THREE.Mesh(geometry, materialWire);
+                // CHILDREN
+                this.add(this.solid);
+                this.add(this.wire);
+            }
+            setWireframe(value = true) {
+                this.solid.setVisible(value);
+            }
+            setColor(hexColor) {
+                this.color = hexColor;
+                this.solid.material.color.setHex(hexColor);
+            }
+            setWireColor(hexColor) {
+                this.wireColor = hexColor;
+                this.wire.material.color.setHex(hexColor);
+            }
+            setDoubleSide(value) {
+                this.doubleSide = value;
+                if(value) {
+                    this.solid.material.side = THREE.DoubleSide;
+                } else {
+                    this.solid.material.side = THREE.FrontSide;
+                }
+            }
+            setOnFloor() {
+                this.solid.geometry.computeBoundingBox();
+                const bBox = this.solid.geometry.boundingBox;
+                this.position.y = -bBox.min.y;
+            }
+        }
+
+        class Car extends Cube {
+            constructor(x = 0, z = 0, theta = Math.PI/2) {
+                super(5, 0x00ff0);
+                this.x = x;
+                this.z = z;
+                this.theta = theta;
+                this.setOnFloor();
+                this.position.set(x, 0, z);
+            }
+            setPosition(x, z) {
+                this.x = x;
+                this.z = z;
+                this.position.set(x, 0, z);
+            }
+            setDirection(dir) {
+                this.theta = dir;
+                this.rotation.y = dir * Math.PI / 180;
+            }
+        }
+
+        class SportsCar extends THREE.Group {
+            constructor(x = 0, z = 0, objFileName = "./assets/obj/sportsCar.obj") {
+                super();
+                this.x = x;
+                this.z = z;
+                this.position.set(x, 0, z);
+                this.color = 0xcc0000;
+                this.wireColor = 0xffffff;
+                this.doubleSide = false;
+                this.rotate = false;
+                this.objFileName = objFileName;
+                this.loadOBJModel(objFileName);
+            }
+            loadOBJModel(objFileName) {
+                // instantiate a loader
+                const loader = new OBJLoader();
+                // load a resource
+                model = this;
+                loader.load(objFileName,
+                            // called when resource is loaded
+                            function (object) { 
+                                // SOLID
+                                object.traverse(function(child) {
+                                    if (child.isMesh) {
+                                        child.material = new THREE.MeshBasicMaterial({color: model.color});
+                                    }
+                                });
+                                model.solid = object;
+                                // WIRE
+                                model.wire = object.clone();
+                                model.wire.traverse(function(child) {
+                                    if (child.isMesh) {
+                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: model.wireColor});
+                                    }
+                                });
+                                //model.rotation.y = Math.PI;
+                                model.scale.set(2, 2, 2);
+                                // CHILDREN
+                                model.add(model.solid);
+                                model.add(model.wire);
+                                scene.add(model);
+                                model.setOnFloor();
+                                        
+                                // MODEL-MENU
+                                const guiModelMenu = gui.addFolder("Model Menu");
+                                // GUI-Model
+                                guiModelMenu.add(model, "visible").setValue(model.visible).name("Visible").listen().onChange(function(value) {
+                                    
+                                });
+                                guiModelMenu.add(model.solid, "visible").setValue(model.solid.visible).name("Wireframe").listen().onChange(function(value) {
+                                                
+                                });
+                                guiModelMenu.add(model, "doubleSide").setValue(model.doubleSide).name("Double Side").listen().onChange(function(value) {
+                                    model.setDoubleSide(value);                                    
+                                });
+                                guiModelMenu.addColor(model, "color").name("Color").setValue(model.color).listen().onChange(function(value) {
+                                    model.setColor(value);
+                                });
+                                guiModelMenu.addColor(model, "wireColor").name("Wire Color").setValue(model.wireColor).listen().onChange(function(value) {
+                                    model.setWireColor(value);
+                                });
+                                guiModelMenu.add(model, "rotate").setValue(model.rotate).name("Rotate").listen().onChange(function(value) {
+                                                                            
+                                });
+                        },
+                        // called when loading is in progresses
+                        function (xhr) {
+                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                        },
+                        // called when loading has errors
+                        function (error) {
+                            console.log( 'An error happened' + error );
+                        }
+                );
+        }
+        setColor(hexColor) {
+            this.color = hexColor;
+            this.solid.traverse(function(child) {
+                            if (child.isMesh) {
+                                child.material.color.setHex(hexColor);
+                            }
+            });
+        }
+        setWireColor(hexColor) {
+            this.wireColor = hexColor;
+            this.wire.traverse(function(child) {
+                            if (child.isMesh) {
+                                child.material.color.setHex(hexColor);
+                            }
+            });
+        }
+        setDoubleSide(value) {
+            this.doubleSide = value;
+            this.solid.traverse(function(child) {
+                if (child.isMesh) {
+                    if(value) {
+                        child.material.side = THREE.DoubleSide;
+                    } else {
+                        child.material.side = THREE.FrontSide;
+                    }
+                }
+            });
+        }
+        setOnFloor() {
+            const bBox = new THREE.Box3();
+            bBox.setFromObject(this.solid);
+            this.position.y = -bBox.min.y;
+        }
+    }
+
+        class Building extends THREE.Group {
+            constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xcc0000, wireColor = 0xffffff) {
+                super();
+                this.front = front;
+                this.length = length;
+                this.height = height;
+                this.position.set(x, 0, z);
+                this.color = color;
+                this.wireColor = wireColor;
+                this.doubleSide = false;
+                this.rotate = false;
+                const geometry = new THREE.BoxGeometry(front, height, depth);
+                const material = new THREE.MeshBasicMaterial({color});
+                const materialWire = new THREE.MeshBasicMaterial({wireframe: true, color: wireColor});
+                this.solid = new THREE.Mesh(geometry, material);
+                this.wire = new THREE.Mesh(geometry, materialWire);
+                // CHILDREN
+                this.add(this.solid);
+                this.add(this.wire);
+            }
+            setWireframe(value = true) {
+                this.solid.setVisible(value);
+            }
+            setColor(hexColor) {
+                this.color = hexColor;
+                this.solid.material.color.setHex(hexColor);
+            }
+            setWireColor(hexColor) {
+                this.wireColor = hexColor;
+                this.wire.material.color.setHex(hexColor);
+            }
+            setDoubleSide(value) {
+                this.doubleSide = value;
+                if(value) {
+                    this.solid.material.side = THREE.DoubleSide;
+                } else {
+                    this.solid.material.side = THREE.FrontSide;
+                }
+            }
+            setOnFloor() {
+                this.solid.geometry.computeBoundingBox();
+                const bBox = this.solid.geometry.boundingBox;
+                this.position.y = -bBox.min.y;
+            }
+        }
+        class Semaph extends THREE.Group {
+            constructor(objFileName = "./assets/obj/trafficlight.obj") {
+                super();
+                this.doubleSide = false;
+                this.rotate = false;
+                //this.rotateX(Math.PI*3/2)
+                const geometry1 = new THREE.CylinderGeometry( 0.35, 0.18, 0.4, 32);
+
+                const material = new THREE.MeshBasicMaterial({wireframe: false});
+                const material2 = new THREE.MeshBasicMaterial({wireframe: false});
+                const material3 = new THREE.MeshBasicMaterial({wireframe: false});
+                const material4 = new THREE.MeshBasicMaterial({wireframe: false});
+                const material5 = new THREE.MeshBasicMaterial({wireframe: false});
+                const material6 = new THREE.MeshBasicMaterial({wireframe: false});
+                this.foco = new THREE.Mesh(geometry1, material);
+                this.foco2 = new THREE.Mesh(geometry1, material2);
+                this.foco3 = new THREE.Mesh(geometry1, material3);
+                this.foco4 = new THREE.Mesh(geometry1, material4);
+                this.foco5 = new THREE.Mesh(geometry1, material5);
+                this.foco6 = new THREE.Mesh(geometry1, material6);
+                
+                this.foco.rotation.x= Math.PI/2
+                this.foco.position.set(0,8,1);
+
+                this.foco2.rotation.x= Math.PI/2
+                this.foco2.position.set(0,9,1);
+
+                this.foco3.rotation.x= Math.PI/2
+                this.foco3.position.set(0,7,1);
+
+                this.foco5.rotation.x= Math.PI/2
+                this.foco5.position.set(10,12.6,0.5);
+
+                this.foco4.rotation.x= Math.PI/2
+                this.foco4.position.set(10,13.3,0.5);
+
+                this.foco6.rotation.x= Math.PI/2
+                this.foco6.position.set(10,11.9,0.5);
+
+                this.objFileName = objFileName;
+                this.loadOBJModel(objFileName);
+            }
+            loadOBJModel(objFileName) {
+                // instantiate a loader
+                const loader = new OBJLoader();
+                // load a resource
+                let house = this;
+
+                
+                loader.load(objFileName,
+                            // called when resource is loaded
+                            function (object) { 
+                                // SOLID
+                                object.traverse(function(child) {
+                                    if (child.isMesh) {
+                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
+                                    }
+                                });
+                                house.solid = object;
+                                // WIRE
+                                house.wire = object.clone();
+                                house.wire.traverse(function(child) {
+                                    if (child.isMesh) {
+                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
+                                    }
+                                });
+                                //house.rotation.z = Math.PI/4;
+                                house.scale.set(0.8,1.6,1.6);
+                                // CHILDREN
+                                house.add(house.solid);
+                                house.add(house.wire);
+                                scene.add(house);
+                                house.setOnFloor();
+                                house.add(house.foco);
+                                house.add(house.foco2);
+                                house.add(house.foco3);
+                                house.add(house.foco4);
+                                house.add(house.foco5);
+                                house.add(house.foco6);
+                                           
+                        },
+                        // called when loading is in progresses
+                        function (xhr) {
+                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                        },
+                        // called when loading has errors
+                        function (error) {
+                            console.log( 'An error happened' + error );
+                        }
+                );
+        }
+        setWireframe(value = true) {
+                this.solid.setVisible(value);
+            }
+            //semaforo principal
+            setColorYellow() {
+                //this.color = hexColor;
+                this.foco5.material.color.setHex("0xffff00");
+                this.foco4.material.color.setHex("0x000000");
+                this.foco6.material.color.setHex("0x000000");
+            }
+            setColorGreen() {
+                //this.color = hexColor;
+                this.foco5.material.color.setHex("0x000000");
+                this.foco4.material.color.setHex("0x00ff00");
+                this.foco6.material.color.setHex("0x000000");
+            }
+            setColorRed() {
+                //this.color = hexColor;
+                this.foco4.material.color.setHex("0x000000");
+                this.foco5.material.color.setHex("0x000000");
+                this.foco6.material.color.setHex("0xff0000");
+            }
+            //semaforo de la izquierda 
+            setColorSideYellow() {
+                //this.color = hexColor;
+                this.foco.material.color.setHex("0xffff00");
+                this.foco2.material.color.setHex("0x000000");
+                this.foco3.material.color.setHex("0x000000");
+            }
+            setColorSideGreen() {
+                //this.color = hexColor;
+                this.foco.material.color.setHex("0x000000");
+                this.foco2.material.color.setHex("0x00ff00");
+                this.foco3.material.color.setHex("0x000000");
+            }
+            setColorSideRed() {
+                //this.color = hexColor;
+                this.foco.material.color.setHex("0x000000");
+                this.foco2.material.color.setHex("0x000000");
+                this.foco3.material.color.setHex("0xff0000");
+            }
+            setWireColor(hexColor) {
+                this.wireColor = hexColor;
+                this.wire.material.color.setHex(hexColor);
+            }
+            setDoubleSide(value) {
+                this.doubleSide = value;
+                if(value) {
+                    this.solid.material.side = THREE.DoubleSide;
+                } else {
+                    this.solid.material.side = THREE.FrontSide;
+                }
+            }
+            setOnFloor() {
+                const bBox = new THREE.Box3();
+                bBox.setFromObject(this.solid);
+                this.position.y = -bBox.min.y;
+            }
+    }
+    class Semaforo extends Semaph {
+            constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0x000000, wireColor = 0x808080) {
+                super();
+                this.x = x;
+                this.z = z;
+                //this.y = 0;
+                
+                this.front = front;
+                this.length = length;
+                this.height = height;
+                this.position.set(x, 0, z);
+                this.color = color;
+                this.wireColor = wireColor;
+        
+            }
+    } 
+
+        class Scenary extends THREE.Group {
+            constructor(size = 1000) {
+                super();
+                this.axes = new Axes(size);
+                this.floor = new Floor(size);
+                this.buildings = [];
+                //SE
+                this.buildings.push(new Building(35, 35, 50, 50, 50));
+                this.buildings.push(new Building(35, 90, 50, 50, 10));
+                this.buildings.push(new Building(35, 145, 50, 50, 20));
+                this.buildings.push(new Building(35, 200, 50, 50, 80));
+                this.buildings.push(new Building(35, 255, 50, 50, 40));
+                
+                this.buildings.push(new Building(90, 35, 50, 50, 10));
+                this.buildings.push(new Building(145, 35, 50, 50, 30));
+                this.buildings.push(new Building(200, 35, 50, 50, 50));
+                this.buildings.push(new Building(255, 35, 50, 50, 10));
+                this.buildings.push(new Building(305, 35, 50, 50, 40));
+
+                // SW (Tec)
+                this.buildings.push(new Building(-35, 35, 50, 50, 5));
+                this.buildings.push(new Building(-35, 90, 50, 50, 5));
+                this.buildings.push(new Building(-35, 145, 50, 50, 5));
+                this.buildings.push(new Building(-35, 200, 50, 50, 5));
+
+                this.buildings.push(new Building(-35, 35, 50, 50, 10));
+                this.buildings.push(new Building(-90, 35, 50, 50, 20));
+                this.buildings.push(new Building(-145, 35, 50, 50, 20));
+                this.buildings.push(new Building(-205, 35, 50, 50, 20));
+                this.buildings.push(new Building(-260, 35, 50, 50, 20));
+                
+                // NE
+                this.buildings.push(new Building(35, -35, 50, 50, 10));
+                this.buildings.push(new Building(90, -35, 50, 50, 20));
+                this.buildings.push(new Building(145, -35, 50, 50, 20));
+                this.buildings.push(new Building(205, -35, 50, 50, 20));
+                this.buildings.push(new Building(260, -35, 50, 50, 20));
+
+                this.buildings.push(new Building(35, -90, 50, 50, 10));
+                this.buildings.push(new Building(35, -145, 50, 50, 20));
+                this.buildings.push(new Building(35, -200, 50, 50, 20));
+                this.buildings.push(new Building(35, -255, 50, 50, 20));
+                this.buildings.push(new Building(35, -310, 50, 50, 20));
+                
+                // NW
+                this.buildings.push(new Building(-35, -35, 50, 50, 10));
+                this.buildings.push(new Building(-90, -35, 50, 50, 20));
+                this.buildings.push(new Building(-145, -35, 50, 50, 20));
+                this.buildings.push(new Building(-205, -35, 50, 50, 20));
+                this.buildings.push(new Building(-260, -35, 50, 50, 20));
+
+                this.buildings.push(new Building(-35, -90, 50, 50, 10));
+                this.buildings.push(new Building(-35, -145, 50, 50, 20));
+                this.buildings.push(new Building(-35, -200, 50, 50, 20));
+                this.buildings.push(new Building(-35, -255, 50, 50, 20));
+                this.buildings.push(new Building(-35, -310, 50, 50, 20));
+                //semaforos
+                 //semaforo ramon corona wallmart
+                 //let sem = new Semaforo(-45, -2, 50, 50, 10, 0X0000000, 0x000000)
+                //semaforo hacia aviacion wallmart
+                let sem2 = new Semaforo(12, 2, 50, 50, 10, 0X0000000, 0x000000)
+                //semaforo ramon corona gas
+                //let sem3 = new Semaforo(7, 40, 50, 50, 10, 0X0000000, 0x000000)
+                
+                //semaforo aviacion cementerio
+                let sem4 = new Semaforo(-12, 2, 50, 50, 10, 0X0000000, 0x000000);
+            
+
+                //sem.rotation.y = Math.PI/2;
+                sem2.rotation.y = Math.PI/2*2;
+                //sem3.rotation.y = Math.PI;
+                //sem3.rotation.y = sem3.rotation.y + Math.PI/2;
+                
+                //sem.setColorGreen();
+                sem2.setColorRed();
+                sem4.setColorRed();
+                //sem3.setColorYellow();
+                //sem.setColorSideGreen();
+                sem2.setColorSideRed();
+                sem4.setColorSideRed();
+                //sem3.setColorSideRed();
+                //sem4.setColorSideYellow();
+                //this.buildings.push(sem);
+                this.buildings.push(sem2);
+                //this.buildings.push(sem3);
+                this.buildings.push(sem4);
+
+                // CHILDREN
+                this.add(this.axes);
+                this.add(this.floor);
+                for(let i = 0; i < this.buildings.length; i++) {
+                    this.add(this.buildings[i]);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
