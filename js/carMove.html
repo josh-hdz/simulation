@@ -25,7 +25,16 @@
 
         "use strict";
 
-        let renderer, scene, camera, orbitControls, stats, gui, data, dataReady = false, k = 0;
+        let renderer,
+            scene,
+            camera,
+            orbitControls,
+            stats,
+            gui,
+            data,
+            dataReady = false,
+            k = 0,
+            arregloCar = [];
         
         function init(event) {
             // RENDERER ENGINE
@@ -46,19 +55,6 @@
 
             // SCENE GRAPH
             scene.add(scenary);
-
-
-            // CAMERA (PERSPECTIVE)
-            /*const fov = 60;    // Field ov view
-            const aspect = window.innerWidth / window.innerHeight;
-            const near = 0.01;
-            const far = 10000.0;
-            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            camera.position.set(-100, 100, 300);
-            // CAMERA CONTROLS
-            orbitControls = new OrbitControls(camera, renderer.domElement);
-            //orbitControls.target = model.position;
-            orbitControls.update();*/
 
             // SETUP STATS
             stats = new Stats();
@@ -93,7 +89,7 @@
                 camera.setSideView();                            
             });
             //read json data
-            readTextFile("/data.json", function(text){
+            readTextFile("./car_data.json", function(text){
                 data = JSON.parse(text);
                 console.log(data.length);
                 dataReady = true; 
@@ -111,7 +107,6 @@
             stats.end();
             requestAnimationFrame(renderLoop);
         }
-        let arregloCar = [];
         function updateScene() {
             if(camera.orbitControls.autoRotate) {
                 camera.orbitControls.update();

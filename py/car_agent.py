@@ -92,7 +92,7 @@ class CarAgent (Agent):
         )
 
         if dp_direction > 0 and dp_place > 0:
-            return math.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2)
+            return math.sqrt((c1[0] - c2[0])**2 + (c1[1] - c2[1])**2) - target.length / 2
 
         # Invalid distance.
         return -1

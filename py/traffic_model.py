@@ -61,6 +61,10 @@ class TrafficModel (Model):
         json.dump(self.car_positions_history, self.car_file, indent=2)
         json.dump(self.traffic_light_state_hsitory, self.traffic_light_file, indent=2)
 
+        print(len(self.car_positions_history))
+        print(len(self.traffic_light_state_hsitory))
+
+
 
     def _place_cars(self):
         # Next car's y cordenate in upstream lane.
@@ -75,8 +79,8 @@ class TrafficModel (Model):
         for next_car in self.cars[0:division_index:]:
             positions.append(
                 (
-                    0.5 * (self.p['a'] + self.p['l']),# X cordenate.
-                    next_up_lane                                # Y cordenate.
+                    0.5 * (self.p['a'] + self.p['l']),  # X cordenate.
+                    next_up_lane - next_car.length      # Y cordenate.
                 )
             )
 
@@ -86,8 +90,8 @@ class TrafficModel (Model):
         for next_car in self.cars[division_index::]:
             positions.append(
                 (
-                    0.5 * (self.p['a'] - self.p['l']),# X cordenate.
-                    next_down_lane                              # Y cordenate.
+                    0.5 * (self.p['a'] - self.p['l']),  # X cordenate.
+                    next_down_lane + next_car.length    # Y cordenate.
                 )
             )
 

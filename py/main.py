@@ -4,7 +4,7 @@ def main():
     param = {
         "car": {
             "amount": 8,
-            "length range": (1.8, 2.3),
+            "length range": (2.5, 4.5),
             "max vel range": (10.0, 16.67),
             "min dist range": (3.0, 5.0)
         },
