@@ -2,10 +2,12 @@ from agentpy import Model, AgentList, Space, AttrIter
 from car_agent import CarAgent
 from traffic_light import TrafficLightAgent
 import json
-import itertools
 class TrafficModel (Model):
 
     def setup(self):
+        self.file = open('./js/data.json', 'w')
+        self.car_positions_history = []
+
         cars_direction = AttrIter(
             (
                 ([(0, 1)] * int(self.p['car']['amount'] * self.p['density'])) +\
@@ -41,16 +43,18 @@ class TrafficModel (Model):
         self.intersection.add_agents(self.cars, self._place_cars())
         self.intersection.add_agents(self.traffic_lights, self._place_traffic_lights())
 
+        self._record_data()
+
     def step(self):
         self.traffic_lights.update()
         self.cars.update_position()
         self.cars.update_speed()
 
     def update(self):
-        pass
+        self._record_data()
 
     def end(self):
-        pass 
+        json.dump(self.car_positions_history, self.file, indent=2)
 
     def _place_cars(self):
         # Next car's y cordenate in upstream lane.
@@ -65,7 +69,7 @@ class TrafficModel (Model):
         for next_car in self.cars[0:division_index:]:
             positions.append(
                 (
-                    round(0.5 * (self.p['a'] + self.p['l']), 1),# X cordenate.
+                    0.5 * (self.p['a'] + self.p['l']),# X cordenate.
                     next_up_lane                                # Y cordenate.
                 )
             )
@@ -76,7 +80,7 @@ class TrafficModel (Model):
         for next_car in self.cars[division_index::]:
             positions.append(
                 (
-                    round(0.5 * (self.p['a'] - self.p['l']), 1),# X cordenate.
+                    0.5 * (self.p['a'] - self.p['l']),# X cordenate.
                     next_down_lane                              # Y cordenate.
                 )
             )
@@ -84,12 +88,6 @@ class TrafficModel (Model):
             next_down_lane += next_car.length + next_car.front_min_dist
         
        
-        print(len(positions))
-        lst2 = [{'x':positions[i][0]/10,'z':positions[i][1]/10, 'id':i} for i in range(len(positions))]
-        diccionario_codificado = json.dumps(lst2)
-        print(diccionario_codificado)
-        with open('data.json', 'w') as file:
-            json.dump(lst2, file, indent=2)
         return positions
 
     def _place_traffic_lights(self):
@@ -102,4 +100,14 @@ class TrafficModel (Model):
                 0.5 * (self.p['a'] - self.p['l']),
                 0.5 * self.p['a'] - self.p['b']
             )
+        ]
+
+    def _record_data(self):
+        self.car_positions_history += [
+            {
+                'x':self.intersection.positions[self.cars[i]][0] - self.p['a'] / 2,
+                'z':self.intersection.positions[self.cars[i]][1] - self.p['a'] / 2,
+                'id':i
+            }
+            for i in range(self.p['car']['amount'])
         ]
