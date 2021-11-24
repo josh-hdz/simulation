@@ -5,7 +5,6 @@ import math
 class CarAgent (Agent):
 
     def setup(self, **kwargs):
-        self.step_time = self.p['step time']
         self.speed = 0.0
         self.direction = kwargs['direction']
         self.max_speed = self.model.random.uniform(
@@ -23,42 +22,49 @@ class CarAgent (Agent):
 
     def update_speed(self):
         front_dist = self.p['a']
+        front_speed = 0
         traffic_light_dist = self.p['a']
-        traffic_lisght_state = None
+        traffic_light_state = 0
 
         for car in self.model.cars:
             dist = self._get_front_dsit(car)
 
-            front_dist = dist if dist != -1 else front_dist
+            if dist != -1 and dist < front_dist:
+                front_dist = dist
+                front_speed = car.speed
 
-        for traffic_light in self.model.traffic_light:
-            dist = self._get_traffic_light_dist()
+        for traffic_light in self.model.traffic_lights:
+            dist = self._get_traffic_light_dist(traffic_light)
 
-            if traffic_light_dist > dist:
-                traffic_lisght_dist = dist
+            if dist != -1 and dist < traffic_light_dist:
+                traffic_light_dist = dist
                 traffic_light_state = traffic_light.state
 
         # Actualiza la velocidad del auto
         if front_dist < self.front_min_dist:
             self.speed = 0
             self.state = 1
+            
+        elif front_dist <= self.front_min_dist:
+            self.speed = np.maximum(self.speed - self.max_speed / (self.speed - front_speed + 0.1) * 200 * self.p['step time'], 0)
+
         elif front_dist < 20:
-            self.speed = np.maximum(self.speed - 200*self.step_time, 0)
+            self.speed = np.maximum((1 - (self.speed - front_speed) / self.max_speed) * 200 * self.p['step time'], 0)
 
         elif front_dist < 50:
-            self.speed = np.maximum(self.speed - 80*self.step_time, 0)
-
+            self.speed = np.maximum((1 - (self.speed - front_speed) / self.max_speed) * 80 * self.p['step time'], 0)
+            
         elif traffic_light_dist < 40 and traffic_light_state == 1:
-            self.speed = np.minimum(self.speed + 5*self.step_time, self.max_speed)
+            self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed)
 
         elif traffic_light_dist < 50 and traffic_light_state == 1:
-            self.speed = np.maximum(self.speed - 20*self.step_time, 0)
+            self.speed = np.maximum(self.speed - 20*self.p['step time'], 0)
             
         elif traffic_light_dist < 100 and traffic_light_state == 2:
-            self.speed = np.maximum(self.speed - 80*self.step_time, 0)
+            self.speed = np.maximum(self.speed - 80*self.p['step time'], 0)
 
         else:
-            self.speed = np.minimum(self.speed + 5*self.step_time, self.max_speed) 
+            self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed) 
 
     def update_position(self):
         self.model.intersection.move_by(
@@ -92,12 +98,12 @@ class CarAgent (Agent):
         return -1
 
     def _get_traffic_light_dist(self, target):
-        c = self.model.intersection.position[self]
-        t = self.model.intersection.position[target]
+        c = self.model.intersection.positions[self]
+        t = self.model.intersection.positions[target]
 
         dp_direction = self._dot_product(
             target.direction,
-            self.directin
+            self.direction
         )
 
         dp_place = self._dot_product(
