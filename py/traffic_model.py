@@ -7,8 +7,8 @@ class TrafficModel (Model):
     def setup(self):
         self.car_file = open('./js/car_data.json', 'w')
         self.traffic_light_file = open('./js/traffic_light_data.json', 'w')
-        self.car_positions_history = []
-        self.traffic_light_state_hsitory = []
+        self.car_positions_history = {}
+        self.traffic_light_state_hsitory = {}
 
         cars_direction = AttrIter(
             (
@@ -113,20 +113,22 @@ class TrafficModel (Model):
         ]
 
     def _record_car_data(self):
-        self.car_positions_history += [
-            {
-                'x':self.intersection.positions[self.cars[i]][0] - self.p['a'] / 2,
-                'z':self.intersection.positions[self.cars[i]][1]/10,
-                'id':i
-            }
-            for i in range(self.p['car']['amount'])
+        self.car_positions_history[len(self.car_positions_history)] =[  
+             
+                {
+                    'x':self.intersection.positions[self.cars[i]][0] - self.p['a'] / 2,
+                    'z':self.intersection.positions[self.cars[i]][1] - self.p['a'] / 2,
+                    'id':i
+                }
+                for i in range(self.p['car']['amount'])
         ]
 
     def _record_traffic_light_data(self):
-        self.traffic_light_state_hsitory += [
-            {
-                'state': self.traffic_lights[i].state,
-                'id': i
-            }
-            for i in range(self.p['traffic lights']['amount'])
+        self.traffic_light_state_hsitory[len(self.traffic_light_state_hsitory)] =[ 
+            
+                {
+                    'state': self.traffic_lights[i].state,
+                    'id': i
+                }
+                for i in range(self.p['traffic lights']['amount'])
         ]
