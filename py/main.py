@@ -10,9 +10,9 @@ def main():
         },
         'traffic lights': {
             'amount': 2,
-            'time red': 2,
-            'time yellow': 2,
-            'time green': 2
+            'time red': 45,
+            'time yellow': 5,
+            'time green': 50
         },
         'a': 500,
         'step time': 0.1,
