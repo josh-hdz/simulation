@@ -93,15 +93,23 @@
             guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
                 camera.setSideView();                            
             });
+<<<<<<< HEAD
+            readTextFile("car_data.json", function(text){
+=======
             readTextFile("./car_data.json", function(text){
+>>>>>>> fabe1700162b8c9992747726300458f36d19eb8c
                 data = JSON.parse(text);
                 console.log(data.length);
                 dataReady = true; 
 
             });
+<<<<<<< HEAD
+            readTextFile2("traffic_light_data.json", function(text){
+=======
             readTextFile2("./traffic_light_data.json", function(text){
+>>>>>>> fabe1700162b8c9992747726300458f36d19eb8c
                 dataSem = JSON.parse(text);
-                console.log(dataSem.length);
+                console.log(dataSem);
                 dataReadySem = true; 
 
             });
@@ -119,17 +127,19 @@
         }
         let num = 0;
         let arregloCar = [];
+        let a = false;
         function updateScene() {
-            if(dataReady && dataReadySem){ 
-                let a = false;
+            /*if(dataReady && dataReadySem){ 
+                
                 while(a){
+                    console.log("Hola");
                     const carID = data[k].id;
                     const x = data[k].x*3;
                     const z = data[k].z;
                     const dir = Math.PI/2;
                     let car = scene.getObjectByName(carID);
                     if(!car){
-                    
+                        console.log(num);
                         let car = new Car(x, z, dir);
                         car.name = carID;
                         arregloCar.push(car);
@@ -137,19 +147,24 @@
 
                     }
                     else{
+                        console.log(num);
                         a = true;
                     }
                 }
-             }
-            if(dataReady && k < data.length && dataReadySem){
-                for(let i = 0; i < num+1; i++){
-                    console.log(data.length);
+                k++;
+                
+             }*/
+             
+            if(dataReady && k < 10002 && dataReadySem){
+                for(let i = 0; i < 8; i++){
+                    console.log(data[i][i].id);
                     //const carID = 0;
-                    const carID = data[k].id;
+                    //et c = i.toString(
+                    const carID = data[k][i].id;
                    
                     //const carID = 0;
-                    const x = data[k].x*3;
-                    const z = data[k].z;
+                    const x = data[k][i].x*3;
+                    const z = data[k][i].z;
                     const dir = Math.PI/2;
                     
                     let car = scene.getObjectByName(carID);
@@ -170,26 +185,33 @@
                   
                     
                 }
-                
-                if(dataSem[k].id == 0){
-                    if(dataSem[k].state == 0){
+                for(let i = 0; i < 2; i++){
+                    if(dataSem[k][i].id == 0){
+                        if(dataSem[k][i].state == 0){
+                            scenary.buildings[scenary.buildings.length-1].setColorYellow();
                             scenary.buildings[scenary.buildings.length-1].setColorGreen();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-1].setColorYellow();
+                            scenary.buildings[scenary.buildings.length-1].setColorRed();
+
+                        }
                     }
                     else{
-                        scenary.buildings[scenary.buildings.length-1].setColorRed();
+                        //console.log("hello");
+                        if(dataSem[k][i].state == 0){
+                            scenary.buildings[scenary.buildings.length-2].setColorYellow();
+                            scenary.buildings[scenary.buildings.length-2].setColorGreen();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-2].setColorYellow();
+                            scenary.buildings[scenary.buildings.length-2].setColorRed();
 
+                        }
                     }
+
                 }
-                else{
-                    if(dataSem[k].state == 0){
-                        scenary.buildings[scenary.buildings.length-2].setColorGreen();
-                    }
-                    else{
-                        scenary.buildings[scenary.buildings.length-2].setColorRed();
-
-                    }
-                }
-
+               
 
                 }
                 k++;
