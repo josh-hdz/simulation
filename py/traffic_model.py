@@ -113,6 +113,7 @@ class TrafficModel (Model):
         ]
 
     def _record_car_data(self):
+<<<<<<< HEAD
         self.car_positions_history[len(self.car_positions_history)] =[  
              
                 {
@@ -121,6 +122,15 @@ class TrafficModel (Model):
                     'id':i
                 }
                 for i in range(self.p['car']['amount'])
+=======
+        self.car_positions_history += [
+            {
+                'x':self.intersection.positions[self.cars[i]][0] - self.p['a'] / 2,
+                'z':self.intersection.positions[self.cars[i]][1] - self.p['a'] / 2,
+                'id':i
+            }
+            for i in range(self.p['car']['amount'])
+>>>>>>> fabe1700162b8c9992747726300458f36d19eb8c
         ]
 
     def _record_traffic_light_data(self):

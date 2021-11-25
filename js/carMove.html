@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        html, body
-        {
+        html,
+        body {
             width: 100%;
             height: 100%;
             padding: 0;
             margin: 0;
             overflow: hidden;
         }
-      </style>
+    </style>
 </head>
+
 <body>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
     <script type="module">
         import * as THREE from 'https://unpkg.com/three/build/three.module.js';
         import Stats from "https://unpkg.com/three/examples/jsm/libs/stats.module.js";
-        import {OrbitControls} from "https://unpkg.com/three@0.119.0/examples/jsm/controls/OrbitControls.js";
-        import {OBJLoader} from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/loaders/OBJLoader.js';
+        import { OrbitControls } from "https://unpkg.com/three@0.119.0/examples/jsm/controls/OrbitControls.js";
+        import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.117.1/examples/jsm/loaders/OBJLoader.js';
 
         "use strict";
 
@@ -35,20 +37,20 @@
             dataReady = false,
             k = 0,
             arregloCar = [];
-        
+
         function init(event) {
             // RENDERER ENGINE
-            renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
             renderer.setClearColor(new THREE.Color(0, 0, 0));
             renderer.setPixelRatio(window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
-            
+
             // SCENE
             scene = new THREE.Scene();
             camera = new Camera();
-            camera.setTopView(); 
+            camera.setTopView();
             // MODELS
             const scenary = new Scenary();
             //model = new SportsCar(0, 225);
@@ -65,34 +67,34 @@
             gui = new dat.GUI();
             // SCENE-MENU
             const guiSceneMenu = gui.addFolder("Scene Menu");
-            guiSceneMenu.add(scenary.axes, "visible").setValue(scenary.axes.visible).name("World Axes").listen().onChange(function(value) {
+            guiSceneMenu.add(scenary.axes, "visible").setValue(scenary.axes.visible).name("World Axes").listen().onChange(function (value) {
                 scenary.axes.setVisible(value);
             });
             guiSceneMenu.open();
             const guiCamaraMenu = gui.addFolder("Camera Menu");
-            guiCamaraMenu.add(camera.orbitControls, "autoRotate").setValue(camera.rotate).name("Rotate").listen().onChange(function(value) {
-                camera.setAutoRotate(value);                                   
+            guiCamaraMenu.add(camera.orbitControls, "autoRotate").setValue(camera.rotate).name("Rotate").listen().onChange(function (value) {
+                camera.setAutoRotate(value);
             });
             //guiCamaraMenu.add(camera, "update").setValue(camera.update).name("Perspective View").listen().onChange(function(value) {
-               // camera.setPerspectiveView();                                   
+            // camera.setPerspectiveView();                                   
             //});
-            guiCamaraMenu.add(camera, "pers" ).setValue(this.pers).name("Perspective View").listen().onChange(function(value) {
-                camera.setPerspectiveView();                                     
+            guiCamaraMenu.add(camera, "pers").setValue(this.pers).name("Perspective View").listen().onChange(function (value) {
+                camera.setPerspectiveView();
             });
-            guiCamaraMenu.add(camera, "top" ).setValue(camera.top).name("Top View").listen().onChange(function(value) {
-                camera.setTopView();                            
+            guiCamaraMenu.add(camera, "top").setValue(camera.top).name("Top View").listen().onChange(function (value) {
+                camera.setTopView();
             });
-            guiCamaraMenu.add(camera, "front" ).setValue(camera.front).name("Front View").listen().onChange(function(value) {
-                camera.setFrontView();                             
+            guiCamaraMenu.add(camera, "front").setValue(camera.front).name("Front View").listen().onChange(function (value) {
+                camera.setFrontView();
             });
-            guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
-                camera.setSideView();                            
+            guiCamaraMenu.add(camera, "side").setValue(camera.side).name("Side View").listen().onChange(function (value) {
+                camera.setSideView();
             });
             //read json data
-            readTextFile("./car_data.json", function(text){
+            readTextFile("./car_data.json", function (text) {
                 data = JSON.parse(text);
                 console.log(data.length);
-                dataReady = true; 
+                dataReady = true;
 
             });
 
@@ -108,28 +110,28 @@
             requestAnimationFrame(renderLoop);
         }
         function updateScene() {
-            if(camera.orbitControls.autoRotate) {
+            if (camera.orbitControls.autoRotate) {
                 camera.orbitControls.update();
             }
-                
-           /*if(model && model.animate) {
-                model.position.z = model.position.z - 0.2;
-               //model.rotation.y = model.rotation.y + 0.01;
-           }*/
-           let m = 0;
-           if(dataReady && k < data.length){
-                
-                for(let i = 0; i < 7; i++){
+
+            /*if(model && model.animate) {
+                 model.position.z = model.position.z - 0.2;
+                //model.rotation.y = model.rotation.y + 0.01;
+            }*/
+            let m = 0;
+            if (dataReady && k < data.length) {
+
+                for (let i = 0; i < 7; i++) {
                     console.log(data.length);
                     //const carID = 0;
                     const carID = data[k].id;
-                    
+
                     //const carID = 0;
-                    const z = data[k].x*10;
-                    const x = data[k].z-25;
-                    const dir = Math.PI/2;
+                    const z = data[k].x * 10;
+                    const x = data[k].z - 25;
+                    const dir = Math.PI / 2;
                     let car = scene.getObjectByName(carID);
-                    if(!car){
+                    if (!car) {
                         console.log("    jjdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
                         let car = new Car(x, z, dir);
                         car.name = carID;
@@ -137,34 +139,34 @@
                         //scene.add(car);
 
                     }
-                    else{
+                    else {
                         console.log(i);
                         car.setPosition(x, z);
                         //car.setDirection(dir);
 
                     }
-                    
+
                 }
                 k++;
                 //console.log(arregloCar.length);
-                for(let i = 0; i < arregloCar.length; i++){
+                for (let i = 0; i < arregloCar.length; i++) {
                     console.log(arregloCar.length);
                     scene.add(arregloCar[i]);
                 }
                 arregloCar = [];
-                
+
             }
-                
-              
+
+
             //console.log(arregloCar.length);
-            
+
         }
         //readFile
         function readTextFile(file, callback) {
             var rawFile = new XMLHttpRequest();
             rawFile.overrideMimeType("application/json");
             rawFile.open("GET", file, true);
-            rawFile.onreadystatechange = function() {
+            rawFile.onreadystatechange = function () {
                 if (rawFile.readyState === 4 && rawFile.status == "200") {
                     callback(rawFile.responseText);
                 }
@@ -177,7 +179,7 @@
         window.addEventListener("resize", () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);            
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }, false);
 
         class Axes extends THREE.AxesHelper {
@@ -192,7 +194,7 @@
             }
         }
         class Camera extends THREE.PerspectiveCamera {
-            constructor(fov = 60, aspect = window.innerWidth / window.innerHeight, near = 0.01, far = 10000){
+            constructor(fov = 60, aspect = window.innerWidth / window.innerHeight, near = 0.01, far = 10000) {
                 super(fov, aspect, near, far);
                 // CAMERA CONTROLS
                 this.car = false;
@@ -205,7 +207,7 @@
                 this.in = false;
                 //this.orbitControls.autoRotate = false; 
                 this.orbitControls = new OrbitControls(this, renderer.domElement);
-                this.orbitControls.update(); 
+                this.orbitControls.update();
 
             }
             setPerspectiveView() {
@@ -265,7 +267,7 @@
                 this.up.set(0, 1, 0);
                 this.orbitControls.update();
             }
-           
+
 
             setAutoRotate(value = true) {
                 this.car = false;
@@ -274,22 +276,22 @@
                 this.side = false;
                 this.in = false;
                 this.dirigida = false;
-                
+
                 this.orbitControls.autoRotate = value;
             }
-        
+
         }
 
-
         class Floor extends THREE.Group {
-            constructor(size = 100) {
+            constructor(size = 110) {
                 super();
                 this.size = size;
                 const geometry = new THREE.PlaneGeometry(size, size);
-                const material = new THREE.MeshBasicMaterial({color: 0x808080});
+                this.gridHelper = new THREE.GridHelper(size, 10, 0xff0000, 0x000000);
+                const texture = new THREE.TextureLoader().load("./assets/textures/asfalto1.jpg");
+                const material = new THREE.MeshBasicMaterial({ map: texture });
                 this.mesh = new THREE.Mesh(geometry, material);
                 this.mesh.rotation.x = -Math.PI / 2;
-                this.gridHelper = new THREE.GridHelper(size, 10, 0xff0000, 0x000000);
                 // CHILDREN
                 this.add(this.mesh);
                 this.add(this.gridHelper);
@@ -305,10 +307,74 @@
             }
         }
 
-       
+        class Sidewalk extends THREE.Group {
+            constructor(size = 0, x = 0, z = 0, front = 50, depth = 50, height = 10) {
+                super();
+                this.size = size;
+                this.x = x;
+                this.z = z;
+                this.front = front;
+                this.length = length;
+                this.height = height;
+                this.position.set(x, 2, z);
+                const geometry = new THREE.PlaneGeometry(size, size);
+                const texture = new THREE.TextureLoader().load("./assets/textures/asfalto2.jpg");
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(5, 5); // 1 en S y otro en T
+                const material = new THREE.MeshBasicMaterial({ map: texture });
+
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.rotation.x = -Math.PI / 2;
+                // CHILDREN
+                this.add(this.mesh);
+            }
+            setVisible(value = true) {
+                this.visible = value;
+            }
+            setWireframe(value = true) {
+                this.material.wireframe = value;
+            }
+            setColor(color) {
+                this.mesh.material.color.setHex(color);
+            }
+        }
+
+        class Grass extends THREE.Group {
+            constructor(size = 0, x = 0, z = 0, front = 50, depth = 50, height = 10) {
+                super();
+                this.size = size;
+                this.x = x;
+                this.z = z;
+                this.front = front;
+                this.length = length;
+                this.height = height;
+                this.position.set(x, 2, z);
+                const geometry = new THREE.PlaneGeometry(size, size);
+                const texture = new THREE.TextureLoader().load("./assets/textures/grass.jpg");
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(2, 2); // 1 en S y otro en T
+                const material = new THREE.MeshBasicMaterial({ map: texture });
+
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.rotation.x = -Math.PI / 2;
+                // CHILDREN
+                this.add(this.mesh);
+            }
+            setVisible(value = true) {
+                this.visible = value;
+            }
+            setWireframe(value = true) {
+                this.material.wireframe = value;
+            }
+            setColor(color) {
+                this.mesh.material.color.setHex(color);
+            }
+        }
 
         class Car extends THREE.Group {
-            constructor(x = 0, z = 0, theta = Math.PI/2, objFileName = "./assets/obj/sportsCar.obj") {
+            constructor(x = 0, z = 0, theta = Math.PI / 2, objFileName = "./assets/obj/carOld.obj") {
                 super();
                 this.color = 0x89ceeb;
                 this.wireColor = 0x89ceeb;
@@ -318,9 +384,10 @@
                 this.x = x;
                 this.z = z;
                 this.name = "";
+                this.texture = new THREE.TextureLoader().load("./assets/textures/vidrioAmarillo.jpg");
                 this.theta = theta;
                 this.loadOBJModel(objFileName);
-                
+
             }
             loadOBJModel(objFileName) {
                 // instantiate a loader
@@ -328,88 +395,90 @@
                 // load a resource
                 const model = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: model.color});
-                                    }
-                                });
-                                model.solid = object;
-                                // WIRE
-                                model.wire = object.clone();
-                                model.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: model.wireColor});
-                                    }
-                                });
-                                model.rotation.y = model.theta;
-                                model.position.set(model.x, 0, model.z);
-                                model.scale.set(1, 1, 1);
-                                // CHILDREN
-                                model.add(model.solid);
-                                model.add(model.wire);
-                                scene.add(model);
-                                
-                                model.setOnFloor();
-                                        
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
-                );
-        }
-        setColor(hexColor) {
-            this.color = hexColor;
-            this.solid.traverse(function(child) {
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
                             if (child.isMesh) {
-                                child.material.color.setHex(hexColor);
+                                child.material = new THREE.MeshBasicMaterial({ map: model.texture });
+                                //child.material = new THREE.MeshBasicMaterial({ color: model.color });
                             }
-            });
-        }
-        setWireColor(hexColor) {
-            this.wireColor = hexColor;
-            this.wire.traverse(function(child) {
+                        });
+                        model.solid = object;
+                        // WIRE
+                        model.wire = object.clone();
+                        model.wire.traverse(function (child) {
                             if (child.isMesh) {
-                                child.material.color.setHex(hexColor);
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, map: model.texture });
+                                //child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: model.wireColor });
                             }
-            });
-        }
-        setDoubleSide(value) {
-            this.doubleSide = value;
-            this.solid.traverse(function(child) {
-                if (child.isMesh) {
-                    if(value) {
-                        child.material.side = THREE.DoubleSide;
-                    } else {
-                        child.material.side = THREE.FrontSide;
-                    }
-                }
-            });
-        }
-        setOnFloor() {
-            const bBox = new THREE.Box3();
-            bBox.setFromObject(this.solid);
-            this.position.y = -bBox.min.y;
-        }
-        setPosition(x, z) {
-            this.x = x;
-            this.z = z;
-            this.position.set(x, 0, z);
-        }
-        setDirection(dir) {
-            this.theta = dir;
-            this.rotation.y = dir * Math.PI / 180;
-        }
-    }
+                        });
+                        model.rotation.y = model.theta;
+                        model.position.set(model.x, 0, model.z);
+                        model.scale.set(10, 10, 10);
+                        // CHILDREN
+                        model.add(model.solid);
+                        model.add(model.wire);
+                        scene.add(model);
 
-    class SportsCar extends Car {
+                        model.setOnFloor();
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
+                );
+            }
+            setColor(hexColor) {
+                this.color = hexColor;
+                this.solid.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material.color.setHex(hexColor);
+                    }
+                });
+            }
+            setWireColor(hexColor) {
+                this.wireColor = hexColor;
+                this.wire.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material.color.setHex(hexColor);
+                    }
+                });
+            }
+            setDoubleSide(value) {
+                this.doubleSide = value;
+                this.solid.traverse(function (child) {
+                    if (child.isMesh) {
+                        if (value) {
+                            child.material.side = THREE.DoubleSide;
+                        } else {
+                            child.material.side = THREE.FrontSide;
+                        }
+                    }
+                });
+            }
+            setOnFloor() {
+                const bBox = new THREE.Box3();
+                bBox.setFromObject(this.solid);
+                this.position.y = -bBox.min.y;
+            }
+            setPosition(x, z) {
+                this.x = x;
+                this.z = z;
+                this.position.set(x, 0, z);
+            }
+            setDirection(dir) {
+                this.theta = dir;
+                this.rotation.y = dir * Math.PI / 180;
+            }
+        }
+
+        class SportsCar extends Car {
             constructor(x = 0, z = 0) {
                 super();
                 this.x = x;
@@ -417,7 +486,7 @@
                 this.animate = false;
                 this.position.set(x, 0, z);
             }
-    }
+        }
         class Building extends THREE.Group {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xcc0000, wireColor = 0xffffff) {
                 super();
@@ -430,8 +499,8 @@
                 this.doubleSide = false;
                 this.rotate = false;
                 const geometry = new THREE.BoxGeometry(front, height, depth);
-                const material = new THREE.MeshBasicMaterial({color});
-                const materialWire = new THREE.MeshBasicMaterial({wireframe: true, color: wireColor});
+                const material = new THREE.MeshBasicMaterial({ color });
+                const materialWire = new THREE.MeshBasicMaterial({ wireframe: true, color: wireColor });
                 this.solid = new THREE.Mesh(geometry, material);
                 this.wire = new THREE.Mesh(geometry, materialWire);
                 // CHILDREN
@@ -451,7 +520,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -463,102 +532,12 @@
                 this.position.y = -bBox.min.y;
             }
         }
-            class Residential extends THREE.Group {
-                constructor(objFileName = "./assets/obj/building_04.obj") {
-                    super();
-                    this.doubleSide = false;
-                    this.rotate = false;
-        
-                    this.objFileName = objFileName;
-                    this.loadOBJModel(objFileName);
-                }
-                loadOBJModel(objFileName) {
-                    // instantiate a loader
-                    const loader = new OBJLoader();
-                    // load a resource
-                    let res = this;
-                    loader.load(objFileName,
-                                // called when resource is loaded
-                                function (object) { 
-                                    // SOLID
-                                    object.traverse(function(child) {
-                                        if (child.isMesh) {
-                                            child.material = new THREE.MeshBasicMaterial({color: res.color});
-                                        }
-                                    });
-                                    res.solid = object;
-                                    // WIRE
-                                    res.wire = object.clone();
-                                    res.wire.traverse(function(child) {
-                                        if (child.isMesh) {
-                                            child.material = new THREE.MeshBasicMaterial({wireframe: true, color: res.wireColor});
-                                        }
-                                    });
-                                    //model.rotation.y = Math.PI;
-                                    res.scale.set(12, 12, 12);
-                                    // CHILDREN
-                                    res.add(res.solid);
-                                    res.add(res.wire);
-                                    scene.add(res);
-                                    res.setOnFloor();
-
-                                            
-                            },
-                            // called when loading is in progresses
-                            function (xhr) {
-                                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                            },
-                            // called when loading has errors
-                            function (error) {
-                                console.log( 'An error happened' + error );
-                            }
-                    );
-            }
-            setWireframe(value = true) {
-                    this.solid.setVisible(value);
-                }
-                setColor(hexColor) {
-                    this.color = hexColor;
-                    this.solid.material.color.setHex(hexColor);
-                }
-                setWireColor(hexColor) {
-                    this.wireColor = hexColor;
-                    this.wire.material.color.setHex(hexColor);
-                }
-                setDoubleSide(value) {
-                    this.doubleSide = value;
-                    if(value) {
-                        this.solid.material.side = THREE.DoubleSide;
-                    } else {
-                        this.solid.material.side = THREE.FrontSide;
-                    }
-                }
-                setOnFloor() {
-                    const bBox = new THREE.Box3();
-                    bBox.setFromObject(this.solid);
-                    this.position.y = -bBox.min.y;
-                }
-        }
-        class ResHouse extends Residential {
-                constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xec7c26, wireColor = 0xF5F5DC) {
-                    super();
-                    this.x = x;
-                    this.z = z;
-                    this.position.set(x, 0, z);
-                    this.front = front;
-                    this.length = length;
-                    this.height = height;
-                    this.position.set(x, 0, z);
-                    this.color = color;
-                    this.wireColor = wireColor;
-                }
-        }
-        class TreeObj extends THREE.Group {
-            constructor(objFileName = "./assets/obj/Tree.obj") {
+        class Residential extends THREE.Group {
+            constructor(objFileName = "./assets/obj/building_04.obj") {
                 super();
                 this.doubleSide = false;
                 this.rotate = false;
-       
+
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
             }
@@ -566,45 +545,45 @@
                 // instantiate a loader
                 const loader = new OBJLoader();
                 // load a resource
-                let house = this;
+                let res = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //model.rotation.y = Math.PI;
-                                house.scale.set(15, 15, 15);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: res.color });
+                            }
+                        });
+                        res.solid = object;
+                        // WIRE
+                        res.wire = object.clone();
+                        res.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: res.wireColor });
+                            }
+                        });
+                        //model.rotation.y = Math.PI;
+                        res.scale.set(12, 12, 12);
+                        // CHILDREN
+                        res.add(res.solid);
+                        res.add(res.wire);
+                        scene.add(res);
+                        res.setOnFloor();
 
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             setColor(hexColor) {
@@ -617,7 +596,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -628,9 +607,99 @@
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
             }
-    }
+        }
+        class ResHouse extends Residential {
+            constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xec7c26, wireColor = 0xF5F5DC) {
+                super();
+                this.x = x;
+                this.z = z;
+                this.position.set(x, 0, z);
+                this.front = front;
+                this.length = length;
+                this.height = height;
+                this.position.set(x, 0, z);
+                this.color = color;
+                this.wireColor = wireColor;
+            }
+        }
+        class TreeObj extends THREE.Group {
+            constructor(objFileName = "./assets/obj/Tree.obj") {
+                super();
+                this.doubleSide = false;
+                this.rotate = false;
 
-    class Tree extends TreeObj {
+                this.objFileName = objFileName;
+                this.loadOBJModel(objFileName);
+            }
+            loadOBJModel(objFileName) {
+                // instantiate a loader
+                const loader = new OBJLoader();
+                // load a resource
+                let house = this;
+                loader.load(objFileName,
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //model.rotation.y = Math.PI;
+                        house.scale.set(15, 15, 15);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        scene.add(house);
+                        house.setOnFloor();
+
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
+                );
+            }
+            setWireframe(value = true) {
+                this.solid.setVisible(value);
+            }
+            setColor(hexColor) {
+                this.color = hexColor;
+                this.solid.material.color.setHex(hexColor);
+            }
+            setWireColor(hexColor) {
+                this.wireColor = hexColor;
+                this.wire.material.color.setHex(hexColor);
+            }
+            setDoubleSide(value) {
+                this.doubleSide = value;
+                if (value) {
+                    this.solid.material.side = THREE.DoubleSide;
+                } else {
+                    this.solid.material.side = THREE.FrontSide;
+                }
+            }
+            setOnFloor() {
+                const bBox = new THREE.Box3();
+                bBox.setFromObject(this.solid);
+                this.position.y = -bBox.min.y;
+            }
+        }
+
+        class Tree extends TreeObj {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0x00FF00, wireColor = 0x008F39) {
                 super();
                 this.x = x;
@@ -642,16 +711,16 @@
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
+
             }
-    }
-      
+        }
+
         class HouseBuild extends THREE.Group {
             constructor(objFileName = "./assets/obj/big-old-house.obj") {
                 super();
                 this.doubleSide = false;
                 this.rotate = false;
-       
+
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
             }
@@ -661,43 +730,43 @@
                 // load a resource
                 let house = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //model.rotation.y = Math.PI;
-                                house.scale.set(7, 7, 7);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //model.rotation.y = Math.PI;
+                        house.scale.set(7, 7, 7);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        scene.add(house);
+                        house.setOnFloor();
 
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             setColor(hexColor) {
@@ -710,7 +779,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -721,9 +790,9 @@
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
             }
-    }
+        }
 
-    class House extends HouseBuild {
+        class House extends HouseBuild {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xcc0000, wireColor = 0xffffff) {
                 super();
                 this.x = x;
@@ -735,16 +804,16 @@
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
-            }
-    }
 
-    class Plants extends THREE.Group {
+            }
+        }
+
+        class Plants extends THREE.Group {
             constructor(objFileName = "./assets/obj/pasto.obj") {
                 super();
                 this.doubleSide = false;
                 this.rotate = false;
-                this.rotateX(Math.PI*3/2)
+                this.rotateX(Math.PI * 3 / 2)
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
             }
@@ -754,43 +823,43 @@
                 // load a resource
                 let house = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //house.rotation.x = Math.PI;
-                                house.scale.set(0.5,0.5,0.5);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //house.rotation.x = Math.PI;
+                        house.scale.set(0.5, 0.5, 0.5);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        scene.add(house);
+                        house.setOnFloor();
 
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             setColor(hexColor) {
@@ -803,7 +872,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -814,21 +883,21 @@
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
             }
-    }
-    class Plant extends Plants {
+        }
+        class Plant extends Plants {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0x008F39, wireColor = 0x008F39) {
                 super();
                 this.x = x;
                 this.z = z;
                 //this.y = 0;
-                
+
                 this.front = front;
                 this.length = length;
                 this.height = height;
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
+
             }
         }
         class Semaph extends THREE.Group {
@@ -837,38 +906,38 @@
                 this.doubleSide = false;
                 this.rotate = false;
                 //this.rotateX(Math.PI*3/2)
-                const geometry1 = new THREE.CylinderGeometry( 0.35, 0.18, 0.4, 32);
+                const geometry1 = new THREE.CylinderGeometry(0.35, 0.18, 0.4, 32);
 
-                const material = new THREE.MeshBasicMaterial({wireframe: false});
-                const material2 = new THREE.MeshBasicMaterial({wireframe: false});
-                const material3 = new THREE.MeshBasicMaterial({wireframe: false});
-                const material4 = new THREE.MeshBasicMaterial({wireframe: false});
-                const material5 = new THREE.MeshBasicMaterial({wireframe: false});
-                const material6 = new THREE.MeshBasicMaterial({wireframe: false});
+                const material = new THREE.MeshBasicMaterial({ wireframe: false });
+                const material2 = new THREE.MeshBasicMaterial({ wireframe: false });
+                const material3 = new THREE.MeshBasicMaterial({ wireframe: false });
+                const material4 = new THREE.MeshBasicMaterial({ wireframe: false });
+                const material5 = new THREE.MeshBasicMaterial({ wireframe: false });
+                const material6 = new THREE.MeshBasicMaterial({ wireframe: false });
                 this.foco = new THREE.Mesh(geometry1, material);
                 this.foco2 = new THREE.Mesh(geometry1, material2);
                 this.foco3 = new THREE.Mesh(geometry1, material3);
                 this.foco4 = new THREE.Mesh(geometry1, material4);
                 this.foco5 = new THREE.Mesh(geometry1, material5);
                 this.foco6 = new THREE.Mesh(geometry1, material6);
-                
-                this.foco.rotation.x= Math.PI/2
-                this.foco.position.set(0,8,1);
 
-                this.foco2.rotation.x= Math.PI/2
-                this.foco2.position.set(0,9,1);
+                this.foco.rotation.x = Math.PI / 2
+                this.foco.position.set(0, 8, 1);
 
-                this.foco3.rotation.x= Math.PI/2
-                this.foco3.position.set(0,7,1);
+                this.foco2.rotation.x = Math.PI / 2
+                this.foco2.position.set(0, 9, 1);
 
-                this.foco5.rotation.x= Math.PI/2
-                this.foco5.position.set(10,12.6,0.5);
+                this.foco3.rotation.x = Math.PI / 2
+                this.foco3.position.set(0, 7, 1);
 
-                this.foco4.rotation.x= Math.PI/2
-                this.foco4.position.set(10,13.3,0.5);
+                this.foco5.rotation.x = Math.PI / 2
+                this.foco5.position.set(10, 12.6, 0.5);
 
-                this.foco6.rotation.x= Math.PI/2
-                this.foco6.position.set(10,11.9,0.5);
+                this.foco4.rotation.x = Math.PI / 2
+                this.foco4.position.set(10, 13.3, 0.5);
+
+                this.foco6.rotation.x = Math.PI / 2
+                this.foco6.position.set(10, 11.9, 0.5);
 
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
@@ -879,50 +948,50 @@
                 // load a resource
                 let house = this;
 
-                
+
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //house.rotation.z = Math.PI/4;
-                                house.scale.set(4,4,4);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
-                                house.add(house.foco);
-                                house.add(house.foco2);
-                                house.add(house.foco3);
-                                house.add(house.foco4);
-                                house.add(house.foco5);
-                                house.add(house.foco6);
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //house.rotation.z = Math.PI/4;
+                        house.scale.set(4, 4, 4);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        scene.add(house);
+                        house.setOnFloor();
+                        house.add(house.foco);
+                        house.add(house.foco2);
+                        house.add(house.foco3);
+                        house.add(house.foco4);
+                        house.add(house.foco5);
+                        house.add(house.foco6);
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             //semaforo principal
@@ -969,7 +1038,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -980,23 +1049,23 @@
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
             }
-    }
-    class Semaforo extends Semaph {
+        }
+        class Semaforo extends Semaph {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0x000000, wireColor = 0x808080) {
                 super();
                 this.x = x;
                 this.z = z;
                 //this.y = 0;
-                
+
                 this.front = front;
                 this.length = length;
                 this.height = height;
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
+
             }
-    } 
+        }
         class GasStation extends THREE.Group {
             constructor(objFileName = "./assets/obj/gas.obj") {
                 super();
@@ -1012,42 +1081,42 @@
                 // load a resource
                 let house = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //house.rotation.z = Math.PI/4;
-                                house.scale.set(0.1,0.1,0.1);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //house.rotation.z = Math.PI/4;
+                        house.scale.set(0.08, 0.08, 0.08);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        scene.add(house);
+                        house.setOnFloor();
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             setColor(hexColor) {
@@ -1060,7 +1129,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -1069,31 +1138,31 @@
             setOnFloor() {
                 const bBox = new THREE.Box3();
                 bBox.setFromObject(this.solid);
-                this.position.y = -bBox.min.y-17;
+                this.position.y = -bBox.min.y - 17;
             }
-    }
-    class Gas extends GasStation {
+        }
+        class Gas extends GasStation {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0x000000, wireColor = 0x808080) {
                 super();
                 this.x = x;
                 this.z = z;
                 //this.y = 0;
-                
+
                 this.front = front;
                 this.length = length;
                 this.height = height;
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
+
             }
-    } 
-    class BuildingBig extends THREE.Group {
+        }
+        class BuildingBig extends THREE.Group {
             constructor(objFileName = "./assets/obj/building.obj") {
                 super();
                 this.doubleSide = false;
                 this.rotate = false;
-                this.rotateX(Math.PI*3/2)
+                this.rotateX(Math.PI * 3 / 2)
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
             }
@@ -1103,43 +1172,43 @@
                 // load a resource
                 let house = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({color: house.color});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //house.rotation.x = Math.PI;
-                                house.scale.set(0.05,0.05,0.05);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //house.rotation.x = Math.PI;
+                        house.scale.set(0.05, 0.05, 0.05);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        scene.add(house);
+                        house.setOnFloor();
 
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             setColor(hexColor) {
@@ -1152,7 +1221,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -1163,31 +1232,34 @@
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
             }
-    }
-    class BuildBig extends BuildingBig {
+        }
+        class BuildBig extends BuildingBig {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xae6e4e, wireColor = 0xae6e4e) {
                 super();
                 this.x = x;
                 this.z = z;
                 //this.y = 0;
-                
+
                 this.front = front;
                 this.length = length;
                 this.height = height;
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
+
             }
-    }   
+        }
+
         class Fuente extends THREE.Group {
             constructor(objFileName = "./assets/obj/fuente.obj") {
                 super();
                 this.doubleSide = false;
                 this.rotate = false;
-                this.rotateX(Math.PI*3/2)
+                this.rotateX(Math.PI * 3 / 2)
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
+                
+
             }
             loadOBJModel(objFileName) {
                 // instantiate a loader
@@ -1195,43 +1267,43 @@
                 // load a resource
                 let house = this;
                 loader.load(objFileName,
-                            // called when resource is loaded
-                            function (object) { 
-                                // SOLID
-                                object.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({});
-                                    }
-                                });
-                                house.solid = object;
-                                // WIRE
-                                house.wire = object.clone();
-                                house.wire.traverse(function(child) {
-                                    if (child.isMesh) {
-                                        child.material = new THREE.MeshBasicMaterial({wireframe: true, color: house.wireColor});
-                                    }
-                                });
-                                //house.rotation.x = Math.PI;
-                                house.scale.set(0.2,0.2,0.2);
-                                // CHILDREN
-                                house.add(house.solid);
-                                house.add(house.wire);
-                                scene.add(house);
-                                house.setOnFloor();
+                    // called when resource is loaded
+                    function (object) {
+                        // SOLID
+                        object.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ color: house.color });
+                            }
+                        });
+                        house.solid = object;
+                        // WIRE
+                        house.wire = object.clone();
+                        house.wire.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = new THREE.MeshBasicMaterial({ wireframe: true, color: house.wireColor });
+                            }
+                        });
+                        //house.rotation.x = Math.PI;
+                        house.scale.set(0.2, 0.2, 0.2);
+                        // CHILDREN
+                        house.add(house.solid);
+                        house.add(house.wire);
+                        house.add(house.texture);
+                        scene.add(house);
+                        house.setOnFloor();
 
-                                           
-                        },
-                        // called when loading is in progresses
-                        function (xhr) {
-                             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                        },
-                        // called when loading has errors
-                        function (error) {
-                            console.log( 'An error happened' + error );
-                        }
+                    },
+                    // called when loading is in progresses
+                    function (xhr) {
+                        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+                    },
+                    // called when loading has errors
+                    function (error) {
+                        console.log('An error happened' + error);
+                    }
                 );
-        }
-        setWireframe(value = true) {
+            }
+            setWireframe(value = true) {
                 this.solid.setVisible(value);
             }
             setColor(hexColor) {
@@ -1244,7 +1316,7 @@
             }
             setDoubleSide(value) {
                 this.doubleSide = value;
-                if(value) {
+                if (value) {
                     this.solid.material.side = THREE.DoubleSide;
                 } else {
                     this.solid.material.side = THREE.FrontSide;
@@ -1255,108 +1327,126 @@
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
             }
-    }
-    class Fontain extends Fuente {
+        }
+
+        class Fontain extends Fuente {
             constructor(x = 0, z = 0, front = 50, depth = 50, height = 10, color = 0xcc0000, wireColor = 0xffffff) {
                 super();
                 this.x = x;
                 this.z = z;
                 //this.y = 0;
-                
+
                 this.front = front;
                 this.length = length;
                 this.height = height;
                 this.position.set(x, 0, z);
                 this.color = color;
                 this.wireColor = wireColor;
-        
+
             }
-    }
+        }
         class Scenary extends THREE.Group {
             constructor(size = 1000) {
                 super();
                 this.axes = new Axes(size);
                 this.floor = new Floor(size);
                 this.buildings = [];
+                
                 //arboles que van con las casas naranjas
                 this.buildings.push(new Tree(160, 60, 100, 100, 50));
                 this.buildings.push(new Tree(260, 60, 100, 100, 50));
                 this.buildings.push(new Tree(60, 60, 100, 100, 50));
                 //this.buildings.push(new Tree(-35, 35, 100, 100, 50));
+                
                 //arboles plaza frente al tec
                 this.buildings.push(new Tree(-70, 60, 100, 100, 50));
                 this.buildings.push(new Tree(-105, 60, 100, 100, 50));
                 this.buildings.push(new Tree(-140, 60, 100, 100, 50));
                 this.buildings.push(new Tree(-175, 60, 100, 100, 50));
-
-
-                this.buildings.push(new ResHouse(120, 200, 50, 50, 10, 0xd7d7d7, 0x655b5b));
-                //plaza frente al tec
-                this.buildings.push(new ResHouse(-70, 130, 50, 50, 10, 0xeed09d, 0x655b5b));
-                this.buildings.push(new ResHouse(-140, 130, 50, 50, 10, 0xeed09d, 0x655b5b));
                 
+                // Edificio frente a la plaza
+                this.buildings.push(new ResHouse(120, 230, 50, 50, 10, 0xd7d7d7, 0x655b5b));
+                
+                //plaza frente al tec
+                this.buildings.push(new ResHouse(-95, 145, 50, 50, 10, 0xeed09d, 0x655b5b));
+                this.buildings.push(new ResHouse(-140, 145, 50, 50, 10, 0xeed09d, 0x655b5b));
+
                 //casas rojas
                 this.buildings.push(new House(-270, 160, 50, 50, 20, 0xB22222, 0xffffff));
                 this.buildings.push(new House(-215, 160, 50, 50, 20, 0xB22222, 0xffffff));
                 this.buildings.push(new House(-325, 160, 50, 50, 20, 0xB22222, 0xffffff));
+                
                 //arboles casas rojas
                 this.buildings.push(new Tree(-440, 160, 100, 100, 50));
                 this.buildings.push(new Tree(-420, 160, 100, 100, 50));
                 this.buildings.push(new Tree(-380, 160, 100, 100, 50));
-                //casas naranjas
-                this.buildings.push(new House(110, 60, 50, 50, 20, 0xec7c26, 0xF5F5DC));
-                this.buildings.push(new House(220, 60, 50, 50, 20, 0xec7c26, 0xF5F5DC));
-                this.buildings.push(new House(330, 60, 50, 50, 20, 0xec7c26, 0xF5F5DC));
                 
-                this.buildings.push(new House(250, 120, 50, 50, 20, 0X462e01, 0xF5F5DC));
-                this.buildings.push(new House(210, 120, 50, 50, 20, 0X462e01, 0xF5F5DC));
-                this.buildings.push(new House(280, 120, 50, 50, 20, 0X462e01, 0xF5F5DC));
-                //casas cafe
-                this.buildings.push(new House(70, 120, 50, 50, 20, 0Xa18262, 0xF5F5DC));
-                this.buildings.push(new House(110, 120, 50, 50, 20, 0Xa18262, 0xF5F5DC));
+                //casas naranjas
+                this.buildings.push(new House(110, 75, 50, 50, 20, 0xec7c26, 0xF5F5DC));
+                this.buildings.push(new House(220, 75, 50, 50, 20, 0xec7c26, 0xF5F5DC));
+                this.buildings.push(new House(330, 75, 50, 50, 20, 0xec7c26, 0xF5F5DC));
+
+                this.buildings.push(new House(240, 135, 50, 50, 20, 0X462e01, 0xF5F5DC));
+                this.buildings.push(new House(210, 135, 50, 50, 20, 0X462e01, 0xF5F5DC));
+                this.buildings.push(new House(280, 135, 50, 50, 20, 0X462e01, 0xF5F5DC));
+                
+                //casas crema
+                this.buildings.push(new House(90, 135, 50, 50, 20, 0Xa18262, 0xF5F5DC));
+                this.buildings.push(new House(130, 135, 50, 50, 20, 0Xa18262, 0xF5F5DC));
+                
                 //pasto cementerio
                 this.buildings.push(new Plant(120, -120, 50, 50, 50));
                 this.buildings.push(new Plant(120, -270, 50, 50, 50));
                 this.buildings.push(new Plant(300, -270, 50, 50, 50));
+                
                 //cementerio
                 this.buildings.push(new ResHouse(240, -110, 50, 50, 10, 0xffffff, 0xf3ca4c));
-                this.buildings.push(new Fontain(110, -110, 50, 50, 50,  0x000000,  0x655b5b));
+                this.buildings.push(new Fontain(110, -110, 50, 50, 50, 0x000000, 0x655b5b));
                 this.buildings.push(new Tree(320, -80, 100, 100, 50));
                 this.buildings.push(new Tree(320, -110, 100, 100, 50));
                 this.buildings.push(new Tree(320, -140, 100, 100, 50));
+                
                 //casas azules entrada tec
-                this.buildings.push(new House(-240, -65, 50, 50, 20, 0x024a86, 0xffffff));
-                this.buildings.push(new House(-210, -110, 50, 50, 20, 0x024a86, 0xffffff));
-                this.buildings.push(new House(-310, -65, 50, 50, 20, 0x024a86, 0xffffff));
+                this.buildings.push(new House(-240, -95, 50, 50, 20, 0x024a86, 0xffffff));
+                this.buildings.push(new House(-210, -145, 60, 50, 20, 0x024a86, 0xffffff));
+                this.buildings.push(new House(-310, -95, 50, 50, 20, 0x024a86, 0xffffff));
+
                 //tec
-                this.buildings.push(new ResHouse(-400, -80, 50, 50, 10, 0X000000, 0x024a86));
-                this.buildings.push(new ResHouse(-400, -160, 50, 50, 10, 0X000000, 0x024a86));
+                this.buildings.push(new ResHouse(-400, -100, 50, 50, 10, 0X000000, 0x024a86));
+                this.buildings.push(new ResHouse(-400, -180, 50, 50, 10, 0X000000, 0x024a86));
+
                 //gasolinera y soriana
-                this.buildings.push(new Gas(-60, -90, 80, 50, 10,  0x434b4d, 0x000000));
-                this.buildings.push(new ResHouse(-90, -210, 50, 50, 10, 0X000000, 0x761125));
-                this.buildings.push(new ResHouse(-90, -290, 50, 50, 10, 0X000000, 0x761125));
+                this.buildings.push(new Gas(-85, -100, 80, 50, 10, 0x434b4d, 0x000000));
+                this.buildings.push(new ResHouse(-100, -210, 50, 50, 10, 0X000000, 0x761125));
+                this.buildings.push(new ResHouse(-100, -290, 50, 50, 10, 0X000000, 0x761125));
 
                 this.buildings.push(new BuildBig(-350, -250, 50, 50, 10, 0Xae6e4e, 0xffffbf));
                 this.buildings.push(new BuildBig(-350, -330, 50, 50, 10, 0Xae6e4e, 0xffffbf));
 
                 this.buildings.push(new BuildBig(-370, 270, 50, 50, 10, 0Xaa8caf, 0x8e6995));
                 this.buildings.push(new BuildBig(-420, 90, 50, 50, 10, 0X2271b3, 0x7ec0ee));
+
+                // Piso
+                this.buildings.push(new Sidewalk(450, -275, -275, 50, 50, 10));
+                this.buildings.push(new Sidewalk(450, 275, 275, 50, 50, 10));
+                this.buildings.push(new Sidewalk(450, -275, 275, 50, 50, 10));
+                this.buildings.push(new Grass(450, 275, -275, 50, 50, 10));
+                
                 //semaforo ramon corona wallmart
                 let sem = new Semaforo(-45, -2, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo hacia aviacion wallmart
                 let sem2 = new Semaforo(-2, 40, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo ramon corona gas
                 let sem3 = new Semaforo(7, 40, 50, 50, 10, 0X0000000, 0x000000)
-                
+
                 //semaforo aviacion cementerio
                 let sem4 = new Semaforo(2, -50, 50, 50, 10, 0X0000000, 0x000000);
-            
 
-                sem.rotation.y = Math.PI/2;
-                sem2.rotation.y = Math.PI/2*2;
+                sem.rotation.y = Math.PI / 2;
+                sem2.rotation.y = Math.PI / 2 * 2;
                 //sem3.rotation.y = Math.PI;
-                sem3.rotation.y = sem3.rotation.y + Math.PI/2;
-                
+                sem3.rotation.y = sem3.rotation.y + Math.PI / 2;
+
                 sem.setColorGreen();
                 sem2.setColorRed();
                 sem4.setColorRed();
@@ -1369,23 +1459,17 @@
                 this.buildings.push(sem2);
                 this.buildings.push(sem3);
                 this.buildings.push(sem4);
-             
-                
-               
-              
 
-             
-                
                 // CHILDREN
-                
                 this.add(this.axes);
                 this.add(this.floor);
-                for(let i = 0; i < this.buildings.length; i++) {
+                for (let i = 0; i < this.buildings.length; i++) {
                     this.add(this.buildings[i]);
                 }
             }
-            
+
         }
     </script>
 </body>
+
 </html>
