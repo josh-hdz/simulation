@@ -183,11 +183,12 @@
                 for(let i = 0; i < 2; i++){
                     if(dataSem[k][i].id == 0){
                         if(dataSem[k][i].state == 0){
-                            scenary.buildings[scenary.buildings.length-1].setColorYellow();
                             scenary.buildings[scenary.buildings.length-1].setColorGreen();
                         }
-                        else{
+                        else if(dataSem[k][i].state == 1){
                             scenary.buildings[scenary.buildings.length-1].setColorYellow();
+                        }
+                        else{
                             scenary.buildings[scenary.buildings.length-1].setColorRed();
 
                         }
@@ -195,11 +196,14 @@
                     else{
                         //console.log("hello");
                         if(dataSem[k][i].state == 0){
-                            scenary.buildings[scenary.buildings.length-2].setColorYellow();
+                            
                             scenary.buildings[scenary.buildings.length-2].setColorGreen();
                         }
-                        else{
+                        else if(dataSem[k][i].state == 1){
                             scenary.buildings[scenary.buildings.length-2].setColorYellow();
+                        }
+                        else{
+                            
                             scenary.buildings[scenary.buildings.length-2].setColorRed();
 
                         }
