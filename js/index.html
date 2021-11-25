@@ -93,6 +93,9 @@
             guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
                 camera.setSideView();                            
             });
+            guiCamaraMenu.add(camera, "animate" ).setValue(camera.animate).name("animate").listen().onChange(function(value) {
+                camera.setInModelView();                            
+            });
 
             readTextFile("car_data.json", function(text){
 
@@ -124,32 +127,7 @@
         let arregloCar = [];
         let a = false;
         function updateScene() {
-            /*if(dataReady && dataReadySem){ 
-                
-                while(a){
-                    console.log("Hola");
-                    const carID = data[k].id;
-                    const x = data[k].x*3;
-                    const z = data[k].z;
-                    const dir = Math.PI/2;
-                    let car = scene.getObjectByName(carID);
-                    if(!car){
-                        console.log(num);
-                        let car = new Car(x, z, dir);
-                        car.name = carID;
-                        arregloCar.push(car);
-                        num++;
-
-                    }
-                    else{
-                        console.log(num);
-                        a = true;
-                    }
-                }
-                k++;
-                
-             }*/
-             
+            
             if(dataReady && k < 10002 && dataReadySem){
                 for(let i = 0; i < 8; i++){
                     console.log(data[i][i].id);
@@ -164,7 +142,7 @@
                     
                     let car = scene.getObjectByName(carID);
                     if(!car){
-                        //console.log("    jjdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+                        
                         let car = new Car(x, z, dir);
                         car.name = carID;
                         arregloCar.push(car);
@@ -208,9 +186,7 @@
 
                         }
                     }
-
                 }
-               
 
                 }
                 k++;
@@ -220,8 +196,15 @@
                     scene.add(arregloCar[i]);
                 }
                 arregloCar = [];
+                if(camera.animate) {
+                    let model = scene.getObjectByName(0);
+                    model.position.z = model.position.z - 0.2;
+                    camera.setInModelView(model);
+               //model.rotation.y = model.rotation.y + 0.01;
+                }
+               
                 
-            }
+        }
            
         
 
@@ -280,12 +263,14 @@
                 this.front = false;
                 this.side = false;
                 this.in = false;
+                this.animate = false;
                 //this.orbitControls.autoRotate = false; 
                 this.orbitControls = new OrbitControls(this, renderer.domElement);
                 this.orbitControls.update(); 
 
             }
             setPerspectiveView() {
+                this.animate = false;
                 //this.pers = true;
                 this.dirigida = false;
                 //this.matrix = false;
@@ -301,6 +286,7 @@
                 this.orbitControls.update();
             }
             setTopView() {
+                this.animate = false;
                 //this.top = true;
                 this.dirigida = false;
                 //this.matrix = false;
@@ -316,6 +302,7 @@
                 this.orbitControls.update();
             }
             setFrontView() {
+                this.animate = false;
                 this.dirigida = false;
                 //this.matrix = false;
                 this.car = false;
@@ -329,6 +316,7 @@
                 this.orbitControls.update();
             }
             setSideView() {
+                this.animate = false;
                 this.dirigida = false;
                 //this.matrix = false;
                 this.car = false;
@@ -345,6 +333,7 @@
            
 
             setAutoRotate(value = true) {
+                this.animate = false;
                 this.car = false;
                 this.top = false;
                 this.pers = false;
@@ -353,6 +342,15 @@
                 this.dirigida = false;
                 
                 this.orbitControls.autoRotate = value;
+            }
+            setInModelView() {
+
+                let model = scene.getObjectByName(0);
+                this.position.set(model.position.x -0.5, model.position.y + 1.7, model.position.z);
+                this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+                this.up.set(0, 1, 0);
+                this.orbitControls.update();
+                this.animate = true;
             }
         
         }
