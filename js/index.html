@@ -93,13 +93,13 @@
             guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
                 camera.setSideView();                            
             });
-            readTextFile("/data.json", function(text){
+            readTextFile("./car_data.json", function(text){
                 data = JSON.parse(text);
                 console.log(data.length);
                 dataReady = true; 
 
             });
-            readTextFile2("a.json", function(text){
+            readTextFile2("./traffic_light_data.json", function(text){
                 dataSem = JSON.parse(text);
                 console.log(dataSem.length);
                 dataReadySem = true; 
@@ -274,7 +274,7 @@
                 this.side = false;
                 this.in = false;
                 //this.orbitControls.autoRotate = false; 
-                this.position.set(-100, 500, 300);
+                this.position.set(-100, 200, 200);
                 this.orbitControls.target = new THREE.Vector3(0, 0, 0);
                 this.up.set(0, 1, 0);
                 this.orbitControls.update();
@@ -289,7 +289,7 @@
                 this.side = false;
                 this.in = false;
                 //this.orbitControls.autoRotate = false; 
-                this.position.set(0, 500, 0);
+                this.position.set(0, 200, 0);
                 this.orbitControls.target = new THREE.Vector3(0, 0, 0);
                 this.up.set(-1, 0, 0);
                 this.orbitControls.update();
@@ -302,7 +302,7 @@
                 this.pers = false;
                 this.side = false;
                 this.in = false;
-                this.position.set(0, 4, 500);
+                this.position.set(0, 4, 100);
                 this.orbitControls.target = new THREE.Vector3(0, 0, 0);
                 this.up.set(0, 1, 0);
                 this.orbitControls.update();
@@ -316,7 +316,7 @@
                 this.front = false;
                 this.in = false;
                 //this.orbitControls.autoRotate = false; 
-                this.position.set(500, 100, 0);
+                this.position.set(200, 100, 0);
                 this.orbitControls.target = new THREE.Vector3(0, 0, 0);
                 this.up.set(0, 1, 0);
                 this.orbitControls.update();
@@ -804,12 +804,12 @@
                  //semaforo ramon corona wallmart
                  //let sem = new Semaforo(-45, -2, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo hacia aviacion wallmart
-                let sem2 = new Semaforo(12, 2, 50, 50, 10, 0X0000000, 0x000000)
+                let sem2 = new Semaforo(12, 5, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo ramon corona gas
                 //let sem3 = new Semaforo(7, 40, 50, 50, 10, 0X0000000, 0x000000)
                 
                 //semaforo aviacion cementerio
-                let sem4 = new Semaforo(-12, 2, 50, 50, 10, 0X0000000, 0x000000);
+                let sem4 = new Semaforo(-12, -5, 50, 50, 10, 0X0000000, 0x000000);
             
 
                 //sem.rotation.y = Math.PI/2;

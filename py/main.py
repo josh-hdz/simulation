@@ -14,7 +14,7 @@ def main():
             'time yellow': 2,
             'time green': 2
         },
-        'a': 1000,
+        'a': 500,
         'step time': 0.1,
         'b': 5,
         'l': 3.6,

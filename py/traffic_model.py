@@ -116,7 +116,7 @@ class TrafficModel (Model):
         self.car_positions_history += [
             {
                 'x':self.intersection.positions[self.cars[i]][0] - self.p['a'] / 2,
-                'z':self.intersection.positions[self.cars[i]][1]/10,
+                'z':self.intersection.positions[self.cars[i]][1] - self.p['a'] / 2,
                 'id':i
             }
             for i in range(self.p['car']['amount'])
