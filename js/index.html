@@ -93,21 +93,16 @@
             guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
                 camera.setSideView();                            
             });
-<<<<<<< HEAD
+
             readTextFile("car_data.json", function(text){
-=======
-            readTextFile("./car_data.json", function(text){
->>>>>>> fabe1700162b8c9992747726300458f36d19eb8c
+
                 data = JSON.parse(text);
                 console.log(data.length);
                 dataReady = true; 
 
             });
-<<<<<<< HEAD
             readTextFile2("traffic_light_data.json", function(text){
-=======
-            readTextFile2("./traffic_light_data.json", function(text){
->>>>>>> fabe1700162b8c9992747726300458f36d19eb8c
+
                 dataSem = JSON.parse(text);
                 console.log(dataSem);
                 dataReadySem = true; 
