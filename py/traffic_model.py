@@ -71,12 +71,16 @@ class TrafficModel (Model):
         next_up_lane = 0.5 * self.p['a'] - self.p['b']
         # Next car's y cordenate in downstream lane.
         next_down_lane = 0.5 * self.p['a'] + self.p['b']
+        # Next car's x cordenate in leftstream lane.
+        next_left_lane = 0.5 * self.p['a'] + self.p['b']
+        # Next car's x cordenate in rightstream lane.
+        next_right_lane = 0.5 * self.p['a'] - self.p['b']
         # agent list index to separate car's in lanes.
         division_index = int(self.p["car"]["amount"] * self.p["density"])
         positions = []
 
         # Cars spwaned in upstream lane.
-        for next_car in self.cars[0:division_index:]:
+        for next_car in self.cars[0:division_index]:
             positions.append(
                 (
                     0.5 * (self.p['a'] + self.p['l']),  # X cordenate.
@@ -86,8 +90,9 @@ class TrafficModel (Model):
 
             next_up_lane -= next_car.length + next_car.front_min_dist
 
+
         # Cars spawned in downstrem lane.
-        for next_car in self.cars[division_index::]:
+        for next_car in self.cars[division_index:division_index * 2]:
             positions.append(
                 (
                     0.5 * (self.p['a'] - self.p['l']),  # X cordenate.
@@ -96,19 +101,49 @@ class TrafficModel (Model):
             )
 
             next_down_lane += next_car.length + next_car.front_min_dist
-        
+
+        # Cars spawned in leftstream lane.
+        for next_car in self.cars[division_index * 2:division_index * 3]:
+            positions.append(
+                (
+                    next_left_lane - next_car.length,   # X cordenate.
+                    0.5 * (self.p['a']  + self.p['l'])  # Y cordenate.
+                )
+            )
+
+            next_left_lane += next_car.length + next_car.front_min_dist
+
+        # Cars spawned in rightstream lane.
+        for next_car in self.cars[division_index * 3:]:
+            positions.append(
+                (
+                    next_right_lane + next_car.length,   # X cordenate.
+                    0.5 * (self.p['a']  - self.p['l'])   # Y cordenate.
+                )
+            )
+            
+            next_right_lane -= next_car.length + next_car.front_min_dist
        
         return positions
 
     def _place_traffic_lights(self):
         return [
             (
-                0.5 * (self.p['a'] + self.p['l']),
-                0.5 * self.p['a'] + self.p['b']
+                0.5 * (self.p['a'] + self.p['l']),  # X cordenate.
+                0.5 * self.p['a'] + self.p['b']     # Y cordenate.
             ),
             (
-                0.5 * (self.p['a'] - self.p['l']),
-                0.5 * self.p['a'] - self.p['b']
+                0.5 * (self.p['a'] - self.p['l']),  # X cordenate.
+                0.5 * self.p['a'] - self.p['b']     # Y cordenate
+            ),
+            (
+                0.5 * self.p['a'] + self.p['b'],    # X cordenate.
+                0.5 * (self.p['a'] - self.p['l'])   # Y cordenate.
+            ),
+            (
+                0.5 * self.p['a'] - self.p['b'],    # X cordenate.
+                0.5 * (self.p['a'] + self.p['l'])   # Y cordenate.
+                
             )
         ]
 
