@@ -34,9 +34,11 @@
             stats,
             gui,
             data,
+            dataSem,
+            dataReadySem = false,
             dataReady = false,
-            k = 0,
-            arregloCar = [];
+            scenary,
+            k = 0;
 
         function init(event) {
             // RENDERER ENGINE
@@ -52,7 +54,7 @@
             camera = new Camera();
             camera.setTopView();
             // MODELS
-            const scenary = new Scenary();
+            scenary = new Scenary();
             //model = new SportsCar(0, 225);
 
             // SCENE GRAPH
@@ -91,10 +93,19 @@
                 camera.setSideView();
             });
             //read json data
-            readTextFile("./car_data.json", function (text) {
+            //readFile
+            readTextFile("car_data.json", function(text){
+
                 data = JSON.parse(text);
                 console.log(data.length);
-                dataReady = true;
+                dataReady = true; 
+
+            });
+            readTextFile2("traffic_light_data.json", function(text){
+
+                dataSem = JSON.parse(text);
+                console.log(dataSem);
+                dataReadySem = true; 
 
             });
 
@@ -109,70 +120,110 @@
             stats.end();
             requestAnimationFrame(renderLoop);
         }
+        let arregloCar = [];
         function updateScene() {
             if (camera.orbitControls.autoRotate) {
                 camera.orbitControls.update();
             }
 
-            /*if(model && model.animate) {
-                 model.position.z = model.position.z - 0.2;
-                //model.rotation.y = model.rotation.y + 0.01;
-            }*/
-            let m = 0;
-            if (dataReady && k < data.length) {
-
-                for (let i = 0; i < 7; i++) {
-                    console.log(data.length);
+            if(dataReady && k < 10002 && dataReadySem){
+                for(let i = 0; i < 8; i++){
+                    //console.log(data[i][i].id);
                     //const carID = 0;
-                    const carID = data[k].id;
-
+                    //et c = i.toString(
+                    const carID = data[k][i].id;
+                   
                     //const carID = 0;
-                    const z = data[k].x * 10;
-                    const x = data[k].z - 25;
-                    const dir = Math.PI / 2;
+                    const x = data[k][i].x*6;
+                    const z = data[k][i].z;
+                    //const dir = Math.PI/2;
+                    const dir = 0;
                     let car = scene.getObjectByName(carID);
-                    if (!car) {
-                        console.log("    jjdjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+                    if(!car){
+                        
                         let car = new Car(x, z, dir);
                         car.name = carID;
                         arregloCar.push(car);
                         //scene.add(car);
 
                     }
-                    else {
-                        console.log(i);
+                    else{
+                        //console.log(i);
                         car.setPosition(x, z);
                         //car.setDirection(dir);
 
                     }
+                  
+                    
+                }
+                for(let i = 0; i < 2; i++){
+                    if(dataSem[k][i].id == 0){
+                        if(dataSem[k][i].state == 0){
+                            scenary.buildings[scenary.buildings.length-1].setColorGreen();
+                        }
+                        else if(dataSem[k][i].state == 1){
+                            scenary.buildings[scenary.buildings.length-1].setColorYellow();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-1].setColorRed();
+
+                        }
+                    }
+                    else{
+                        //console.log("hello");
+                        if(dataSem[k][i].state == 0){
+                            
+                            scenary.buildings[scenary.buildings.length-2].setColorGreen();
+                        }
+                        else if(dataSem[k][i].state == 1){
+                            scenary.buildings[scenary.buildings.length-2].setColorYellow();
+                        }
+                        else{
+                            
+                            scenary.buildings[scenary.buildings.length-2].setColorRed();
+
+                        }
+                    }
+                }
 
                 }
                 k++;
-                //console.log(arregloCar.length);
-                for (let i = 0; i < arregloCar.length; i++) {
+                for(let i = 0; i < arregloCar.length; i++){
                     console.log(arregloCar.length);
                     scene.add(arregloCar[i]);
                 }
                 arregloCar = [];
-
-            }
-
-
-            //console.log(arregloCar.length);
+                if(camera.animate) {
+                    let model = scene.getObjectByName(0);
+                    model.position.z = model.position.z - 0.2;
+                    camera.setInModelView(model);
+               //model.rotation.y = model.rotation.y + 0.01;
+                }
 
         }
-        //readFile
         function readTextFile(file, callback) {
             var rawFile = new XMLHttpRequest();
             rawFile.overrideMimeType("application/json");
             rawFile.open("GET", file, true);
-            rawFile.onreadystatechange = function () {
+            rawFile.onreadystatechange = function() {
                 if (rawFile.readyState === 4 && rawFile.status == "200") {
                     callback(rawFile.responseText);
                 }
             }
             rawFile.send(null);
         }
+        function readTextFile2(file, callback) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function() {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send(null);
+        }
+        
         // EVENT LISTENERS & HANDLERS
         document.addEventListener("DOMContentLoaded", init);
 
@@ -415,7 +466,7 @@
                         });
                         model.rotation.y = model.theta;
                         model.position.set(model.x, 0, model.z);
-                        model.scale.set(10, 10, 10);
+                        model.scale.set(6, 6, 6);
                         // CHILDREN
                         model.add(model.solid);
                         model.add(model.wire);
