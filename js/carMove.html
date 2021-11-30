@@ -318,7 +318,7 @@
                 arregloCar = [];
                 if(camera.animate) {
                     let model = scene.getObjectByName(0);
-                    model.position.z = model.position.z - 0.2;
+                    model.position.z = model.position.z - 15;
                     camera.setInModelView(model);
                //model.rotation.y = model.rotation.y + 0.01;
                 }
@@ -463,8 +463,8 @@
             setInModelView() {
 
                 let model = scene.getObjectByName(0);
-                this.position.set(model.position.x -0.5, model.position.y + 1.7, model.position.z);
-                this.orbitControls.target = new THREE.Vector3(0, 0, 0);
+                this.position.set(model.position.x - 1, model.position.y + 5, model.position.z);
+                this.orbitControls.target = new THREE.Vector3(5000,5000 ,5000);
                 this.up.set(0, 1, 0);
                 this.orbitControls.update();
                 this.animate = true;
