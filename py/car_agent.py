@@ -41,12 +41,11 @@ class CarAgent (Agent):
                 traffic_light_state = traffic_light.state
 
         # Actualiza la velocidad del auto
-        if front_dist < self.front_min_dist:
+        if front_dist <= 0:
             self.speed = 0
             self.state = 1
             
-        elif front_dist <= self.front_min_dist:
-            self.speed = np.maximum(self.speed - self.max_speed / (self.speed - front_speed + 0.1) * 200 * self.p['step time'], 0)
+        if self.speed - self.max_speed / (self.speed - front_speed + 0.1) * 200 * self.p['step time'], 0)
 
         elif front_dist < self.front_min_dist:
               self.speed = np.maximum(self.speed - 200*self.p['step time'], 0)
@@ -161,13 +160,7 @@ class CarAgent (Agent):
 
     #     intersec.move_by(self, (0, self.direction * self.velocity))
 
-    def _accelerate(self):
-        if self.velocity < self.max_speed:
-            self.velocity += 1
-
-    def _deaccelerate(self):
-        if self.velocity > 0:
-            self.velocity -= 1
+ 
 
     def _dot_product(self, v1, v2):
         return v1[0] * v2[0] + v1[1] * v2[1]

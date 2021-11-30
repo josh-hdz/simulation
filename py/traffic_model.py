@@ -77,6 +77,8 @@ class TrafficModel (Model):
         json.dump(self.car_positions_history, self.car_file, indent=2)
         json.dump(self.traffic_light_state_hsitory, self.traffic_light_file, indent=2)
 
+    # Determiens whcih pair of traffic lights will change state to green based
+    # on the amount of cars waiting the green light.
     def next_green(self):
             traffic = self.traffic_lights.calculate_traffic()
 
@@ -88,6 +90,8 @@ class TrafficModel (Model):
                 self.traffic_lights[2].green_light()
                 self.traffic_lights[3].green_light()
 
+    # Calculates how many cars will be placed to each lane depending on its
+    # direction and the lane density.
     def _calc_cars_per_direction(self, num_directions):
         leftover = 0
         cars_per_dir = []
@@ -104,6 +108,7 @@ class TrafficModel (Model):
 
         return cars_per_dir
 
+    # Returns a tuples' lsit with the initial x and y cordenates for all cars
     def _place_cars(self):
         # Next car's y cordenate in upstream lane.
         next_up_lane = 0.5 * self.p['a'] - self.p['b']
@@ -173,6 +178,7 @@ class TrafficModel (Model):
        
         return positions
 
+    # Returns a tuples' list with the initial x and y cordenates for all traffic litghts.
     def _place_traffic_lights(self):
         return [
             (   # Light controling upstream lane.
@@ -193,6 +199,7 @@ class TrafficModel (Model):
             )
         ]
 
+    # Appends all car's x and z cordenates to a list.
     def _record_car_data(self):
 
         self.car_positions_history[len(self.car_positions_history)] =[  
@@ -205,7 +212,8 @@ class TrafficModel (Model):
                 for i in range(self.p['car']['amount'])
 
         ]
-    
+
+    # Appends all traffic lights' state to a list.
     def _record_traffic_light_data(self):
         self.traffic_light_state_hsitory[len(self.traffic_light_state_hsitory)] =[ 
             
@@ -215,7 +223,8 @@ class TrafficModel (Model):
                 }
                 for i in range(self.p['traffic lights']['amount'])
         ]
-    
+
+    # Returns true when all traffic lights' state is 2 (red).
     def _all_red(self):
         for light in self.traffic_lights:
             if light.state != 2:

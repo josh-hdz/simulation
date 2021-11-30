@@ -39,7 +39,6 @@ class TrafficLightAgent(Agent):
 
         return traffic
 
-
     def green_light(self): #Poner el semaforo de color verde
         self.state = 0
         self.state_time = 0
