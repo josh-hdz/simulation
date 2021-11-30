@@ -91,6 +91,9 @@
             guiSceneMenu.add(scenary, "solidM").setValue(scenary.solidM).name("Material").listen().onChange(function (value) {
                 scenary.setMaterial(value);
             });
+            guiSceneMenu.add(scenary, "visibleCity").setValue(scenary.visibleCity).name("Visible city").listen().onChange(function (value) {
+                scenary.setVisibleCity(value);
+            });
             guiSceneMenu.open();
             const guiCamaraMenu = gui.addFolder("Camera Menu");
             guiCamaraMenu.add(camera.orbitControls, "autoRotate").setValue(camera.rotate).name("Rotate").listen().onChange(function (value) {
@@ -1589,6 +1592,7 @@
                 this.floor = new Floor(size);
                 this.buildings = [];
                 this.solidM = true;
+                this.visibleCity =true;
                 
                 //arboles que van con las casas naranjas
                 this.buildings.push(new Tree(160, 60, 100, 100, 50));
@@ -1708,23 +1712,6 @@
                 //this.setSolidCity();
                 //this.setVisibleCity();
             }
-            setSolidCity(){
-                this.solidM = true;
-                for (let i = 0; i < this.buildings.length; i++) {
-                    
-                    for (let i = 0; i < this.buildings.length; i++) { 
-                        this.buildings[i].traverse(function (child) {
-                            if (child.isMesh) {
-                                child.material.wireframe = true;
-                                //child.material = new THREE.MeshBasicMaterial({color: child.material.color, wireframe: true});
-                                 
-                            }
-                            //child.material.wireframe = false;
-                        });
-                    }     
-                }
-
-            }
             setMaterial(value){
                 if(value == true){
                     this.solidM = true;
@@ -1761,28 +1748,21 @@
 
                 }
             }
-            setCityLines(){
-                this.solidM = false;
-                for (let i = 0; i < this.buildings.length; i++) {
-                    
-                    for (let i = 0; i < this.buildings.length; i++) { 
-                        this.buildings[i].traverse(function (child) {
-                            if (child.isMesh) {
-                                child.material.wireframe = false;
-                                //child.material = new THREE.MeshBasicMaterial({color: child.material.color, wireframe: true});
-                                 
-                            }
-                            //child.material.wireframe = false;
-                        });
-                    }     
+            setVisibleCity(value){
+                if (value == false){
+                    this.visibleCity = false;
+                    for (let i = 0; i < this.buildings.length; i++) {
+                        this.buildings[i].visible = false;
+                    } 
                 }
-            }
-            setVisibleCity(){
-                for (let i = 0; i < this.buildings.length; i++) {
-                    //console.log(this.buildings[i].solid);
-                    this.buildings[i].visible = false;
-                    
-                }    
+                else{
+                    this.visibleCity = true;
+                    for (let i = 0; i < this.buildings.length; i++) {
+                        this.buildings[i].visible = true;
+                    } 
+
+                }
+                   
 
             }
 
