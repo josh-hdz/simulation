@@ -41,32 +41,32 @@ class CarAgent (Agent):
                 traffic_light_state = traffic_light.state
 
         # Actualiza la velocidad del auto
-        if front_dist <= 0:
+        if front_dist < 1:
             self.speed = 0
             self.state = 1
-            
-        if self.speed - self.max_speed / (self.speed - front_speed + 0.1) * 200 * self.p['step time'], 0)
-
         elif front_dist < self.front_min_dist:
               self.speed = np.maximum(self.speed - 200*self.p['step time'], 0)
 
-        elif front_dist < 20:
+        elif front_dist < self.front_min_dist * 1.2:
               self.speed = np.maximum(self.speed - 100*self.p['step time'], 0)
 
-        elif front_dist < 50:
+        elif front_dist < self.front_min_dist * 1.5:
               self.speed = np.maximum(self.speed - 80*self.p['step time'], 0)
-            
-        elif traffic_light_dist < 40 and traffic_light_state == 1:
+
+        elif traffic_light_state == 1 and traffic_light_dist < self.p['b'] * 2 + 10:
             self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed)
 
-        elif traffic_light_dist < 50 and traffic_light_state == 1:
-            self.speed = np.maximum(self.speed - 20*self.p['step time'], 0)
-            
-        elif traffic_light_dist < 100 and traffic_light_state == 2:
-            self.speed = np.maximum(self.speed - 80*self.p['step time'], 0)
+        elif traffic_light_state == 1 and traffic_light_dist < self.p['b'] * 2 + 50:
+            self.speed = np.maximum(self.speed - 2*self.p['step time'], 0)
+        
+        elif traffic_light_state == 2 and traffic_light_dist < self.p['b'] * 2 + 10:
+            self.speed = np.maximum(self.speed - 2*self.p['step time'], 0)
+
+        elif traffic_light_state == 2 and traffic_light_dist < self.p['b'] * 2 + 50:
+            self.speed = np.maximum(self.speed - 10*self.p['step time'], 0)
 
         else:
-            self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed) 
+            self.speed = np.minimum(self.speed + 5 * self.p['step time'], self.max_speed 
 
     def update_position(self):
         self.model.intersection.move_by(
