@@ -463,7 +463,7 @@
             setInModelView() {
 
                 let model = scene.getObjectByName(0);
-                this.position.set(model.position.x - 1, model.position.y + 5, model.position.z);
+                this.position.set(model.position.x - 1, model.position.y + 8, model.position.z);
                 this.orbitControls.target = new THREE.Vector3(5000,5000 ,5000);
                 this.up.set(0, 1, 0);
                 this.orbitControls.update();
