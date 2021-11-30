@@ -55,10 +55,12 @@
             camera.setTopView();
             // MODELS
             scenary = new Scenary();
+
             //model = new SportsCar(0, 225);
 
             // SCENE GRAPH
             scene.add(scenary);
+            
 
             // SETUP STATS
             stats = new Stats();
@@ -120,8 +122,10 @@
             stats.end();
             requestAnimationFrame(renderLoop);
         }
+        
         let arregloCar = [];
         function updateScene() {
+            scenary.setVisibleCity();
             if (camera.orbitControls.autoRotate) {
                 camera.orbitControls.update();
             }
@@ -150,6 +154,7 @@
                     else{
                         //console.log(i);
                         car.setPosition(x, z);
+                        //car.setWireFrameCar();
                         //car.setDirection(dir);
 
                     }
@@ -163,6 +168,7 @@
                         }
                         else if(dataSem[k][i].state == 1){
                             scenary.buildings[scenary.buildings.length-1].setColorYellow();
+                            scenary.buildings[scenary.buildings.length-1].setW();
                         }
                         else{
                             scenary.buildings[scenary.buildings.length-1].setColorRed();
@@ -174,6 +180,7 @@
                         if(dataSem[k][i].state == 0){
                             
                             scenary.buildings[scenary.buildings.length-2].setColorGreen();
+                            //scenary.buildings[scenary.buildings.length-2].setW();
                         }
                         else if(dataSem[k][i].state == 1){
                             scenary.buildings[scenary.buildings.length-2].setColorYellow();
@@ -191,6 +198,7 @@
                 for(let i = 0; i < arregloCar.length; i++){
                     console.log(arregloCar.length);
                     scene.add(arregloCar[i]);
+                    
                 }
                 arregloCar = [];
                 if(camera.animate) {
@@ -484,6 +492,14 @@
                         console.log('An error happened' + error);
                     }
                 );
+            }
+            setWireFrameCar(){
+                this.solid.traverse(function (child) {
+                    if (child.isMesh) {
+                        console.log(child.solid);
+                        //child.material.color.setHex("0xffff00");
+                    }
+                });
             }
             setColor(hexColor) {
                 this.color = hexColor;
@@ -1066,6 +1082,12 @@
             }
             //semaforo de la izquierda 
             setColorSideYellow() {
+                this.solid.traverse(function (child) {
+                    if (child.isMesh) {
+                        //child.setVisible(false);
+                        child.material.color.setHex("0xffff00");
+                    }
+                });
                 //this.color = hexColor;
                 this.foco.material.color.setHex("0xffff00");
                 this.foco2.material.color.setHex("0x000000");
@@ -1099,6 +1121,18 @@
                 const bBox = new THREE.Box3();
                 bBox.setFromObject(this.solid);
                 this.position.y = -bBox.min.y;
+            }
+            setW(){
+                //console.log(this.solid);
+                this.solid.visible = false;
+                this.solid.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.visible = false;
+                        //child.solid.setVisible(false);
+                        //console.log(child.solid);
+                        //child.material.color.setHex("0xffff00");
+                    }
+                });
             }
         }
         class Semaforo extends Semaph {
@@ -1498,18 +1532,19 @@
                 //sem3.rotation.y = Math.PI;
                 sem3.rotation.y = sem3.rotation.y + Math.PI / 2;
 
-                sem.setColorGreen();
+                /*sem.setColorGreen();
                 sem2.setColorRed();
                 sem4.setColorRed();
                 sem3.setColorYellow();
                 sem.setColorSideGreen();
                 sem2.setColorSideRed();
                 sem3.setColorSideRed();
-                sem4.setColorSideYellow();
+                sem4.setColorSideYellow();*/
                 this.buildings.push(sem);
                 this.buildings.push(sem2);
                 this.buildings.push(sem3);
                 this.buildings.push(sem4);
+                
 
                 // CHILDREN
                 this.add(this.axes);
@@ -1517,9 +1552,29 @@
                 for (let i = 0; i < this.buildings.length; i++) {
                     this.add(this.buildings[i]);
                 }
+                this.setVisibleCity();
+            }
+            setVisibleCity(){
+                for (let i = 0; i < this.buildings.length; i++) {
+                    //console.log(this.buildings[i].solid);
+                    this.buildings[i].visible = true;
+                    //console.log(this.buildings[i].children);
+                    //console.log(this.buildings[i].solid);
+                    /*this.buildings[i].solid.traverse(function (child) {
+                    if (child.isMesh) {
+                        
+                        //child.solid.setVisible(false);
+                        //console.log(child.solid);
+                        //child.material.color.setHex("0xffff00");
+                        }
+                    });*/
+                }
+                
+
             }
 
         }
+        
     </script>
 </body>
 
