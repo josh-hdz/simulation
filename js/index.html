@@ -93,7 +93,7 @@
             guiCamaraMenu.add(camera, "side" ).setValue(camera.side).name("Side View").listen().onChange(function(value) {
                 camera.setSideView();                            
             });
-            guiCamaraMenu.add(camera, "animate" ).setValue(camera.animate).name("animate").listen().onChange(function(value) {
+            guiCamaraMenu.add(camera, "animate" ).setValue(camera.animate).name("Set view in car").listen().onChange(function(value) {
                 camera.setInModelView();                            
             });
 
