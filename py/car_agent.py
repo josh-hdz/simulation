@@ -56,7 +56,6 @@ class CarAgent (Agent):
 
         elif front_dist < 50:
               self.speed = np.maximum(self.speed - 80*self.p['step time'], 0)
-
             
         elif traffic_light_dist < 40 and traffic_light_state == 1:
             self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed)
@@ -109,7 +108,7 @@ class CarAgent (Agent):
             target.direction,
             self.direction
         )
-
+        
         dp_place = self._dot_product(
             (
                 t[0] - c[0],

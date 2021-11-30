@@ -9,22 +9,26 @@ class TrafficModel (Model):
         self.traffic_light_file = open('./js/traffic_light_data.json', 'w')
         self.car_positions_history = {}
         self.traffic_light_state_hsitory = {}
+        self.cars_per_dir = self._calc_cars_per_direction(4)
 
         cars_direction = AttrIter(
-            (
-                ([(0, 1)] * int(self.p['car']['amount'] * self.p['density'])) +\
-                ([(0, -1)] * int(self.p['car']['amount'] * (1 - self.p['density'])))
-            )
+            # upstream.
+            ([(0, 1)] * self.cars_per_dir[0]) +\
+            # downstream.
+            ([(0, -1)] * self.cars_per_dir[1]) +\
+            # leftstream.
+            ([(-1, 0)] * self.cars_per_dir[2]) +\
+            # rightstream.
+            ([(1, 0)] * self.cars_per_dir[3])
         )
 
-        traffic_lights_direction = AttrIter([(0, -1),(0, 1)])
-
-        # Generate car agents.
-        self.cars = AgentList(
-            self,
-            self.p["car"]["amount"],
-            CarAgent,
-            direction=cars_direction
+        traffic_lights_direction = AttrIter(
+            [
+                (0, -1),    # controls upstream.
+                (0, 1),     # controls downstream.
+                (1, 0),     # controls leftstream.
+                (-1, 0)     # controls rightstream.
+            ]
         )
 
         # Generates traffic lights agents
@@ -33,6 +37,14 @@ class TrafficModel (Model):
             self.p['traffic lights']['amount'],
             TrafficLightAgent,
             direction=traffic_lights_direction
+        )
+
+        # Generate car agents.
+        self.cars = AgentList(
+            self,
+            self.p["car"]["amount"],
+            CarAgent,
+            direction=cars_direction
         )
 
         # Generate space.
@@ -45,11 +57,15 @@ class TrafficModel (Model):
         self.intersection.add_agents(self.cars, self._place_cars())
         self.intersection.add_agents(self.traffic_lights, self._place_traffic_lights())
 
+        self.next_green()
+
         self._record_car_data()
         self._record_traffic_light_data()
 
     def step(self):
         self.traffic_lights.update()
+        if self._all_red():
+            self.next_green()
         self.cars.update_position()
         self.cars.update_speed()
 
@@ -61,10 +77,32 @@ class TrafficModel (Model):
         json.dump(self.car_positions_history, self.car_file, indent=2)
         json.dump(self.traffic_light_state_hsitory, self.traffic_light_file, indent=2)
 
-        print(len(self.car_positions_history))
-        print(len(self.traffic_light_state_hsitory))
+    def next_green(self):
+            traffic = self.traffic_lights.calculate_traffic()
 
+            if traffic[0] + traffic[1] > traffic[2] + traffic[3]:
+                self.traffic_lights[0].green_light()
+                self.traffic_lights[1].green_light()
 
+            else:
+                self.traffic_lights[2].green_light()
+                self.traffic_lights[3].green_light()
+
+    def _calc_cars_per_direction(self, num_directions):
+        leftover = 0
+        cars_per_dir = []
+
+        for i in range(num_directions):
+            cars_in_dir = self.p['car']['amount'] * self.p['density'][i]
+
+            leftover += cars_in_dir - int(cars_in_dir)
+
+            cars_per_dir.append(int(cars_in_dir))
+
+        for _ in range(int(leftover)):
+            cars_per_dir[self.random.randint(0, num_directions - 1)] += 1
+
+        return cars_per_dir
 
     def _place_cars(self):
         # Next car's y cordenate in upstream lane.
@@ -75,12 +113,14 @@ class TrafficModel (Model):
         next_left_lane = 0.5 * self.p['a'] + self.p['b']
         # Next car's x cordenate in rightstream lane.
         next_right_lane = 0.5 * self.p['a'] - self.p['b']
-        # agent list index to separate car's in lanes.
-        division_index = int(self.p["car"]["amount"] * self.p["density"])
+        # index to start iterating the agent list.
+        start = 0
+        # index to stop iterating the agnet list.
+        end = self.cars_per_dir[0]
         positions = []
 
         # Cars spwaned in upstream lane.
-        for next_car in self.cars[0:division_index]:
+        for next_car in self.cars[start:end]:
             positions.append(
                 (
                     0.5 * (self.p['a'] + self.p['l']),  # X cordenate.
@@ -90,9 +130,11 @@ class TrafficModel (Model):
 
             next_up_lane -= next_car.length + next_car.front_min_dist
 
+        start = end
+        end = start + self.cars_per_dir[1]
 
         # Cars spawned in downstrem lane.
-        for next_car in self.cars[division_index:division_index * 2]:
+        for next_car in self.cars[start:end]:
             positions.append(
                 (
                     0.5 * (self.p['a'] - self.p['l']),  # X cordenate.
@@ -102,22 +144,27 @@ class TrafficModel (Model):
 
             next_down_lane += next_car.length + next_car.front_min_dist
 
+        start = end
+        end = start + self.cars_per_dir[2]
+
         # Cars spawned in leftstream lane.
-        for next_car in self.cars[division_index * 2:division_index * 3]:
+        for next_car in self.cars[start:end]:
             positions.append(
                 (
-                    next_left_lane - next_car.length,   # X cordenate.
+                    next_left_lane + next_car.length,   # X cordenate.
                     0.5 * (self.p['a']  + self.p['l'])  # Y cordenate.
                 )
             )
 
             next_left_lane += next_car.length + next_car.front_min_dist
 
+        start = end
+
         # Cars spawned in rightstream lane.
-        for next_car in self.cars[division_index * 3:]:
+        for next_car in self.cars[start:]:
             positions.append(
                 (
-                    next_right_lane + next_car.length,   # X cordenate.
+                    next_right_lane - next_car.length,   # X cordenate.
                     0.5 * (self.p['a']  - self.p['l'])   # Y cordenate.
                 )
             )
@@ -128,22 +175,21 @@ class TrafficModel (Model):
 
     def _place_traffic_lights(self):
         return [
-            (
+            (   # Light controling upstream lane.
                 0.5 * (self.p['a'] + self.p['l']),  # X cordenate.
                 0.5 * self.p['a'] + self.p['b']     # Y cordenate.
             ),
-            (
+            (   # Light controling downstream lane.
                 0.5 * (self.p['a'] - self.p['l']),  # X cordenate.
                 0.5 * self.p['a'] - self.p['b']     # Y cordenate
             ),
-            (
+            (   # Light controling leftstream lane.
+                0.5 * self.p['a'] - self.p['b'],    # X cordenate.
+                0.5 * (self.p['a'] + self.p['l'])   # Y cordenate. 
+            ),
+            (   # Light controling rightstream lane.
                 0.5 * self.p['a'] + self.p['b'],    # X cordenate.
                 0.5 * (self.p['a'] - self.p['l'])   # Y cordenate.
-            ),
-            (
-                0.5 * self.p['a'] - self.p['b'],    # X cordenate.
-                0.5 * (self.p['a'] + self.p['l'])   # Y cordenate.
-                
             )
         ]
 
@@ -159,6 +205,7 @@ class TrafficModel (Model):
                 for i in range(self.p['car']['amount'])
 
         ]
+    
     def _record_traffic_light_data(self):
         self.traffic_light_state_hsitory[len(self.traffic_light_state_hsitory)] =[ 
             
@@ -168,3 +215,10 @@ class TrafficModel (Model):
                 }
                 for i in range(self.p['traffic lights']['amount'])
         ]
+    
+    def _all_red(self):
+        for light in self.traffic_lights:
+            if light.state != 2:
+                return False
+
+        return True
