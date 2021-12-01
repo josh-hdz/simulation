@@ -298,11 +298,37 @@
                             scenary.buildings[scenary.buildings.length-1].setColorGreen();
                         }
                         else if(dataSem[k][i].state == 1){
-                            scenary.buildings[scenary.buildings.length-1].setColorYellow();
+                            //scenary.buildings[scenary.buildings.length-1].setColorYellow();
                             scenary.buildings[scenary.buildings.length-1].setW();
                         }
                         else{
                             scenary.buildings[scenary.buildings.length-1].setColorRed();
+
+                        }
+                    }
+                    else if(dataSem[k][i].id == 1){
+                        if(dataSem[k][i].state == 0){
+                            scenary.buildings[scenary.buildings.length-3].setColorGreen();
+                        }
+                        else if(dataSem[k][i].state == 1){
+                            //scenary.buildings[scenary.buildings.length-3].setColorYellow();
+                            scenary.buildings[scenary.buildings.length-3].setW();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-3].setColorRed();
+
+                        }
+                    }
+                    else if(dataSem[k][i].id == 2){
+                        if(dataSem[k][i].state == 0){
+                            scenary.buildings[scenary.buildings.length-4].setColorGreen();
+                        }
+                        else if(dataSem[k][i].state == 1){
+                            //scenary.buildings[scenary.buildings.length-4].setColorYellow();
+                            scenary.buildings[scenary.buildings.length-4].setW();
+                        }
+                        else{
+                            scenary.buildings[scenary.buildings.length-4].setColorRed();
 
                         }
                     }
@@ -1210,7 +1236,7 @@
 
                 this.foco6.rotation.x = Math.PI / 2
                 this.foco6.position.set(10, 11.9, 0.5);
-
+                this.setColorSideRed();
                 this.objFileName = objFileName;
                 this.loadOBJModel(objFileName);
             }
