@@ -9,7 +9,6 @@ class TrafficLightAgent(Agent):
         self.state_time = 0
         self.green = self.p['traffic lights']['time green']
         self.yellow = self.p['traffic lights']['time yellow']
-        self.red =self.p['traffic lights']['time red']
         self.direction = kwargs['direction']
 
     def update(self):

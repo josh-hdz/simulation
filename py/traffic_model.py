@@ -5,6 +5,7 @@ import json
 class TrafficModel (Model):
 
     def setup(self):
+        self.dead_time = 0.0
         self.car_file = open('./js/car_data.json', 'w')
         self.traffic_light_file = open('./js/traffic_light_data.json', 'w')
         self.car_positions_history = {}
@@ -82,13 +83,29 @@ class TrafficModel (Model):
     def next_green(self):
             traffic = self.traffic_lights.calculate_traffic()
 
-            if traffic[0] + traffic[1] > traffic[2] + traffic[3]:
-                self.traffic_lights[0].green_light()
-                self.traffic_lights[1].green_light()
+            if self.dead_time <= 0.0:
+ 
+                # More traffic in vertical lanes.
+                if traffic[0] + traffic[1] > traffic[2] + traffic[3]:
+                    self.traffic_lights[0].green_light()
+                    self.traffic_lights[1].green_light()
+
+                # More traffic in horizontal lanes.
+                elif traffic[2] + traffic[3] > traffic[0] + traffic[1]:
+                    self.traffic_lights[2].green_light()
+                    self.traffic_lights[3].green_light()
+
+                # Same traffic in vertical and horizontal lanes.
+                else:
+                    chosen = self.random.choises([(0,1), (2,3)], [0.5, 0.5])[0]
+
+                    self.traffic_lights[chosen[0]].green_light()
+                    self.traffic_lights[chosen[1]].green_light()
+
+                self.dead_time = self.p['dead time']
 
             else:
-                self.traffic_lights[2].green_light()
-                self.traffic_lights[3].green_light()
+                self.dead_time -= self.p['step time']
 
     # Calculates how many cars will be placed to each lane depending on its
     # direction and the lane density.
