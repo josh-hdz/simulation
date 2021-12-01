@@ -102,7 +102,7 @@ class TrafficModel (Model):
 
                 # Same traffic in vertical and horizontal lanes.
                 else:
-                    chosen = self.random.choises([(0,1), (2,3)], [0.5, 0.5])[0]
+                    chosen = self.random.choices([(0,1), (2,3)], [0.5, 0.5])[0]
 
                     self.traffic_lights[chosen[0]].green_light()
                     self.traffic_lights[chosen[1]].green_light()
