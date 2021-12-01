@@ -271,8 +271,20 @@
                     //const carID = 0;
                     const x = data[k][i].x;
                     const z = data[k][i].z;
-                    //const dir = Math.PI/2;
-                    const dir = 0;
+                    let dir = Math.PI/2;
+                    if(x == -15.0){
+                        dir = Math.PI;
+                    }
+                    else if(x == 15.0){
+                        dir = 0;
+                    }
+                    else if(z == 15.0){
+                        dir = Math.PI*3 / 2;
+                    }
+                    else if(z == -15.0){
+                        dir = Math.PI / 2;;
+                    }
+                    
                     let car = scene.getObjectByName(carID);
                     if(!car){
                         

@@ -16,10 +16,10 @@ def main():
         },
         'a': 1000,
         'step time': 0.01,
-        'b': 20,
+        'b': 30,
         'l': 30,
         'density': (0.20, 0.42, 0.23, 0.15),
-        'steps': 10000 
+        'steps': 20000
     }
 
     model = TrafficModel(param)
