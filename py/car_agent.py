@@ -66,7 +66,7 @@ class CarAgent (Agent):
             self.speed = np.maximum(self.speed - 10*self.p['step time'], 0)
 
         else:
-            self.speed = np.minimum(self.speed + 5 * self.p['step time'], self.max_speed 
+            self.speed = np.minimum(self.speed + 5 * self.p['step time'], self.max_speed) 
 
     def update_position(self):
         self.model.intersection.move_by(
