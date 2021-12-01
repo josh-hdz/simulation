@@ -8,8 +8,10 @@ class TrafficModel (Model):
         self.dead_time = 0.0
         self.car_file = open('./js/car_data.json', 'w')
         self.traffic_light_file = open('./js/traffic_light_data.json', 'w')
+        self.history_file = open('./js/data.json', 'w')
         self.car_positions_history = {}
         self.traffic_light_state_hsitory = {}
+        self.history = {}
         self.cars_per_dir = self._calc_cars_per_direction(4)
 
         cars_direction = AttrIter(
@@ -62,6 +64,7 @@ class TrafficModel (Model):
 
         self._record_car_data()
         self._record_traffic_light_data()
+        
 
     def step(self):
         self.traffic_lights.update()
@@ -77,6 +80,8 @@ class TrafficModel (Model):
     def end(self):
         json.dump(self.car_positions_history, self.car_file, indent=2)
         json.dump(self.traffic_light_state_hsitory, self.traffic_light_file, indent=2)
+        self._record_data()
+        json.dump(self.history, self.history_file, indent = 2)
 
     # Determiens whcih pair of traffic lights will change state to green based
     # on the amount of cars waiting the green light.
@@ -214,6 +219,16 @@ class TrafficModel (Model):
                 0.5 * self.p['a'] + self.p['b'],    # X cordenate.
                 0.5 * (self.p['a'] - self.p['l'])   # Y cordenate.
             )
+        ]
+    def _record_data(self):
+        self.history =[  
+             
+            {
+                'amount': self.p['car']['amount'],
+                'frames': self.p["steps"],
+                'semAmount': self.p['traffic lights']['amount']
+            }
+
         ]
 
     # Appends all car's x and z cordenates to a list.
