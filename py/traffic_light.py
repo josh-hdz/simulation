@@ -24,6 +24,8 @@ class TrafficLightAgent(Agent):
             if self.state_time >= self.yellow:
                 self.state = 2
                 self.state_time = 0
+        
+        self.calculate_waiting()
 
     def calculate_traffic(self):
         traffic = 0

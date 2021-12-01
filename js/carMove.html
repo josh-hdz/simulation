@@ -242,6 +242,9 @@
         }
         
         let arregloCar = [];
+        let frames = 1000;
+        let carNum = 0;
+        let semNum = 0;
         function updateScene() {
             
             if (camera.orbitControls.autoRotate) {
@@ -253,9 +256,7 @@
                 camera.setInModelView(model);
                //model.rotation.y = model.rotation.y + 0.01;
             }
-            let frames = 1000;
-            let carNum = 0;
-            let semNum = 0;
+            
 
             if(dataReady && k < frames && dataReadySem && dataReadyGen){
                 //console.log(dataGen[0].semAmount);
