@@ -57,13 +57,16 @@ class CarAgent (Agent):
             self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed)
 
         elif traffic_light_state == 1 and traffic_light_dist < self.p['b'] * 2 + 50:
-            self.speed = np.maximum(self.speed - 2*self.p['step time'], 0)
+            self.speed = np.maximum(self.speed - 1*self.p['step time'], 0)
         
+        elif traffic_light_state == 2 and traffic_light_dist < self.p['b'] * 2:
+            self.speed = np.minimum(self.speed + 5*self.p['step time'], self.max_speed)
+
         elif traffic_light_state == 2 and traffic_light_dist < self.p['b'] * 2 + 10:
-            self.speed = np.maximum(self.speed - 2*self.p['step time'], 0)
+            self.speed = np.maximum(self.speed - 5*self.p['step time'], 0)
 
         elif traffic_light_state == 2 and traffic_light_dist < self.p['b'] * 2 + 50:
-            self.speed = np.maximum(self.speed - 10*self.p['step time'], 0)
+            self.speed = np.maximum(self.speed - 3.5*self.p['step time'], 0)
 
         else:
             self.speed = np.minimum(self.speed + 5 * self.p['step time'], self.max_speed)

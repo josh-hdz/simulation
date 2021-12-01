@@ -7,7 +7,8 @@ class TrafficLightAgent(Agent):
         # Declaracion de variables
         self.state = 2
         self.state_time = 0
-        self.green = self.p['traffic lights']['time green']
+        self.waiting = 0
+        self.green = 0
         self.yellow = self.p['traffic lights']['time yellow']
         self.direction = kwargs['direction']
 
@@ -37,6 +38,19 @@ class TrafficLightAgent(Agent):
                 traffic += 1
 
         return traffic
+
+    def calculate_waiting(self):
+        if self.state == 2:
+            start = sum(self.model.cars_per_dir[0:self.id - 1])
+            end = start + self.model.cars_per_dir[self.id -1]
+            
+            # time of waiting
+            for car in self.model.cars[start:end]:
+                if car._get_traffic_light_dist(self) != -1 and car.speed == 0:
+                    self.waiting += self.p['step time']
+
+        else:
+            self.waiting = 0
 
     def green_light(self): #Poner el semaforo de color verde
         self.state = 0

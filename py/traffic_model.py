@@ -60,6 +60,7 @@ class TrafficModel (Model):
         self.intersection.add_agents(self.cars, self._place_cars())
         self.intersection.add_agents(self.traffic_lights, self._place_traffic_lights())
 
+        self.traffic_lights.calculate_waiting()
         self.next_green()
 
         self._record_car_data()
@@ -86,31 +87,38 @@ class TrafficModel (Model):
     # Determiens whcih pair of traffic lights will change state to green based
     # on the amount of cars waiting the green light.
     def next_green(self):
-            traffic = self.traffic_lights.calculate_traffic()
+        traffic = self.traffic_lights.calculate_traffic()
+        token = [
+            traffic[i] + wait * 2
+            for i, wait in enumerate(self.traffic_lights.waiting)
+        ]
 
-            if self.dead_time <= 0.0:
- 
-                # More traffic in vertical lanes.
-                if traffic[0] + traffic[1] > traffic[2] + traffic[3]:
-                    self.traffic_lights[0].green_light()
-                    self.traffic_lights[1].green_light()
+        if self.dead_time <= 0.0:
+            # More traffic in vertical lanes.
+            if token[0] + token[1] > token[2] + token[3]:
+                self.traffic_lights[0].green_light()
+                self.traffic_lights[1].green_light()
+                self.traffic_lights[0].green = 0.2 * max(traffic[0], traffic[1])
+                self.traffic_lights[1].green = 0.2 * max(traffic[1], traffic[0])
 
-                # More traffic in horizontal lanes.
-                elif traffic[2] + traffic[3] > traffic[0] + traffic[1]:
-                    self.traffic_lights[2].green_light()
-                    self.traffic_lights[3].green_light()
+            # More traffic in horizontal lanes.
+            elif token[2] + token[3] > token[0] + token[1]:
+                self.traffic_lights[2].green_light()
+                self.traffic_lights[3].green_light()
+                self.traffic_lights[2].green = 0.2 * max(traffic[2], traffic[3])
+                self.traffic_lights[3].green = 0.2 * max(traffic[3], traffic[2])
 
-                # Same traffic in vertical and horizontal lanes.
-                else:
-                    chosen = self.random.choices([(0,1), (2,3)], [0.5, 0.5])[0]
-
-                    self.traffic_lights[chosen[0]].green_light()
-                    self.traffic_lights[chosen[1]].green_light()
-
-                self.dead_time = self.p['dead time']
-
+            # Same traffic in vertical and horizontal lanes.
             else:
-                self.dead_time -= self.p['step time']
+                chosen = self.random.choices([(0,1), (2,3)], [0.5, 0.5])[0]
+
+                self.traffic_lights[chosen[0]].green_light()
+                self.traffic_lights[chosen[1]].green_light()
+
+            self.dead_time = self.p['dead time']
+
+        else:
+            self.dead_time -= self.p['step time']
 
     # Calculates how many cars will be placed to each lane depending on its
     # direction and the lane density.
