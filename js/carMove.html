@@ -35,7 +35,9 @@
             gui,
             data,
             dataSem,
+            dataGen,
             dataReadySem = false,
+            dataReadyGen = false,
             dataReady = false,
             scenary,
             k = 0, 
@@ -219,6 +221,13 @@
                 dataReadySem = true; 
 
             });
+            readTextFile3("data.json", function(text){
+
+                dataGen = JSON.parse(text);
+                console.log(data);
+                dataReadyGen = true; 
+
+            });
 
             // DRAW SCENE IN A RENDER LOOP (ANIMATION)
             renderLoop();
@@ -244,9 +253,16 @@
                 camera.setInModelView(model);
                //model.rotation.y = model.rotation.y + 0.01;
             }
+            let frames = 1000;
+            let carNum = 0;
+            let semNum = 0;
 
-            if(dataReady && k < 10002 && dataReadySem){
-                for(let i = 0; i < 20; i++){
+            if(dataReady && k < frames && dataReadySem && dataReadyGen){
+                //console.log(dataGen[0].semAmount);
+                frames = dataGen[0].frames;
+                carNum = dataGen[0].amount;
+                semNum = dataGen[0].semAmount;
+                for(let i = 0; i < carNum; i++){
                     //console.log(data[i][i].id);
                     //const carID = 0;
                     //et c = i.toString(
@@ -276,7 +292,7 @@
                   
                     
                 }
-                for(let i = 0; i < 2; i++){
+                for(let i = 0; i < semNum; i++){
                     if(dataSem[k][i].id == 0){
                         if(dataSem[k][i].state == 0){
                             scenary.buildings[scenary.buildings.length-1].setColorGreen();
@@ -336,6 +352,17 @@
             rawFile.send(null);
         }
         function readTextFile2(file, callback) {
+            var rawFile = new XMLHttpRequest();
+            rawFile.overrideMimeType("application/json");
+            rawFile.open("GET", file, true);
+            rawFile.onreadystatechange = function() {
+                if (rawFile.readyState === 4 && rawFile.status == "200") {
+                    callback(rawFile.responseText);
+                }
+            }
+            rawFile.send(null);
+        }
+        function readTextFile3(file, callback) {
             var rawFile = new XMLHttpRequest();
             rawFile.overrideMimeType("application/json");
             rawFile.open("GET", file, true);
@@ -1700,28 +1727,21 @@
                 this.buildings.push(new Grass(450, 275, -275, 50, 50, 10));
                 
                 //semaforo ramon corona wallmart
-                let sem = new Semaforo(-45, -2, 50, 50, 10, 0X0000000, 0x000000)
+                let sem = new Semaforo(45, -45, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo hacia aviacion wallmart
-                let sem2 = new Semaforo(-2, 40, 50, 50, 10, 0X0000000, 0x000000)
+                let sem2 = new Semaforo(40, 50, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo ramon corona gas
-                let sem3 = new Semaforo(7, 40, 50, 50, 10, 0X0000000, 0x000000)
+                let sem3 = new Semaforo(2, 40, 50, 50, 10, 0X0000000, 0x000000)
 
                 //semaforo aviacion cementerio
-                let sem4 = new Semaforo(2, -50, 50, 50, 10, 0X0000000, 0x000000);
+                let sem4 = new Semaforo(-40, -50, 50, 50, 10, 0X0000000, 0x000000);
 
-                sem.rotation.y = Math.PI / 2;
+                sem.rotation.y = Math.PI/(2/3);
                 sem2.rotation.y = Math.PI / 2 * 2;
                 //sem3.rotation.y = Math.PI;
                 sem3.rotation.y = sem3.rotation.y + Math.PI / 2;
 
-                /*sem.setColorGreen();
-                sem2.setColorRed();
-                sem4.setColorRed();
-                sem3.setColorYellow();
-                sem.setColorSideGreen();
-                sem2.setColorSideRed();
-                sem3.setColorSideRed();
-                sem4.setColorSideYellow();*/
+               
                 this.buildings.push(sem);
                 this.buildings.push(sem2);
                 this.buildings.push(sem3);
