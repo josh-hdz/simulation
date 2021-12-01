@@ -1310,6 +1310,7 @@
                 this.foco5.material.color.setHex("0xffff00");
                 this.foco4.material.color.setHex("0x000000");
                 this.foco6.material.color.setHex("0x000000");
+                //this.material.color.setHex("0xffff00");
             }
             setColorGreen() {
                 //this.color = hexColor;
@@ -1765,14 +1766,14 @@
                 this.buildings.push(new Grass(450, 275, -275, 50, 50, 10));
                 
                 //semaforo ramon corona wallmart
-                let sem = new Semaforo(45, -45, 50, 50, 10, 0X0000000, 0x000000)
+                let sem = new Semaforo(-40, -40, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo hacia aviacion wallmart
-                let sem2 = new Semaforo(40, 50, 50, 50, 10, 0X0000000, 0x000000)
+                let sem2 = new Semaforo(40, -50, 50, 50, 10, 0X0000000, 0x000000)
                 //semaforo ramon corona gas
                 let sem3 = new Semaforo(2, 40, 50, 50, 10, 0X0000000, 0x000000)
 
                 //semaforo aviacion cementerio
-                let sem4 = new Semaforo(-40, -50, 50, 50, 10, 0X0000000, 0x000000);
+                let sem4 = new Semaforo(-40, 40, 50, 50, 10, 0X0000000, 0x000000);
 
                 sem.rotation.y = Math.PI/(2/3);
                 sem2.rotation.y = Math.PI / 2 * 2;
