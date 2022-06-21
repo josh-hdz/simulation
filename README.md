@@ -1,1 +1,1 @@
-# simulation
+# This project is a traffic simulation developed in Python with the agent-py framework and TREE.js for the graphic representation of the city and the cars. It is about the interaction of the cars as independent agents with collaborative actions.
